@@ -68,6 +68,26 @@ npm run dev
 3. Wichtig: Der OpenCode-Server muss aus dem öffentlichen Internet erreichbar
    sein. Sichere ihn zusätzlich ab (das Basic-Passwort ist die Mindestabsicherung).
 
+### Backend öffentlich erreichbar machen (Tunnel)
+
+Für Tests/Demos lässt sich der lokale Server bequem per Cloudflare Quick Tunnel
+öffentlich machen:
+
+```sh
+# cloudflared installieren (Windows: winget install Cloudflare.cloudflared)
+cloudflared tunnel --url http://127.0.0.1:4096
+# → gibt eine URL wie https://xxx.trycloudflare.com aus
+```
+
+Diese URL als `OPENCODE_BASE_URL` in Vercel eintragen. Achtung: Die
+Quick-Tunnel-URL ist zufällig und ändert sich bei jedem Neustart des Tunnels.
+Für einen stabilen Produktivbetrieb einen benannten Tunnel (eigene Domain)
+oder einen gehosteten Server verwenden.
+
+> ⚠️ Der Tunnel macht deinen OpenCode-Server öffentlich erreichbar. Wer das
+> Basic-Passwort kennt, kann darauf zugreifen. Verwende für echte Produktion
+> eine stärkere Absicherung (z. B. Reverse Proxy mit Auth oder ein VPN).
+
 > Hinweis: API-Routen sind mit `maxDuration = 300` (5 Minuten) konfiguriert.
 > Auf dem kostenlosen Vercel-Plan ist die Standardgrenze 60 s – kürzere
 > Agent-Antworten wählen oder [Fluid Compute](https://vercel.com/docs/functions/fluid-compute)
