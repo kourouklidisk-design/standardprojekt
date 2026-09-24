@@ -1,27 +1,31 @@
-# Standardprojekt – OpenCode Chat App
+# AppForge – AI-App-Builder
 
-Eine Next.js-App, die eine Chat-Oberfläche bereitstellt und sich über die
-[OpenCode HTTP API](https://opencode.ai/v2/docs/api) mit einem OpenCode-Server
-verbindet. Das Frontend läuft auf **Vercel**, der eigentliche OpenCode-Agent
-läuft auf einem Rechner deiner Wahl (lokal, VPS, Docker …).
+Eine komplett kostenlose AI-Coding-Web-App: Über einen Prompt erstellst du
+**Homepages, Spiele und kleine Web-Apps** – das Ergebnis wird direkt im Browser
+angezeigt. Rechts siehst du die Live-Vorschau, links läuft der Chat.
 
-## Architektur
+Gebaut mit Next.js (Frontend) und einem **OpenCode-Server** als kostenlosem
+KI-Backend (Standardmodell `space-bunny-free`, inkl. Tool-Unterstützung, ohne
+API-Key).
 
 ```
-Browser  →  Vercel (Next.js)  →  OpenCode-Server  →  LLM-Provider
-           UI + /api/chat         (opencode serve)
-           + /api/health          Zustand & Agenten-Logik
+Browser  →  Vercel (Next.js)  →  OpenCode-Server  →  Free-Modell (opencode.ai)
+           Chat + Vorschau          (opencode serve)   Generiert HTML/CSS/JS
 ```
 
-Warum so? OpenCode ist ein zustandsbehafteter Server (Sessions, Dateisystem,
-Laufzeitprozesse). Vercel-Funktionen sind kurzlebig und ohne dauerhaften
-Speicher – daher lebt die OpenCode-Instanz extern und die Vercel-App spricht
-sie per HTTP an.
+## Features
+
+- 💬 **Chat** mit Prompt: „Erstelle eine Landingpage …", „Baue ein Snake-Spiel …"
+- 🖼️ **Live-Vorschau** des erzeugten Ergebnisses (sandboxed iframe)
+- 🧩 **Code-Ansicht**, Kopieren & Download als `index.html`, in neuem Tab öffnen
+- 🧠 **Kostenlose Modell-Auswahl** (alle `opencode`-Modelle ohne Kosten, live vom Server geladen)
+- 🔁 **Iterativ verbessern** – Folge-Prompts berücksichtigen den zuletzt erzeugten Code
+- 💾 Persistenter Chat-Verlauf im Browser (localStorage)
+- 📱 Responsive: Mobil (Tab-Umschalter) und Desktop (zweispaltig)
 
 ## Lokales Setup
 
-Voraussetzungen: Node.js ≥ 20, eine OpenCode-Installation mit mindestens einem
-konfigurierten Modell.
+Voraussetzungen: Node.js ≥ 20, OpenCode-CLI mit mind. einem kostenlosen Modell konfiguriert.
 
 ```sh
 # 1. Abhängigkeiten installieren
@@ -31,11 +35,11 @@ npm install
 cp .env.example .env.local
 #   → OPENCODE_PASSWORD setzen (wird beim Serverstart ausgegeben)
 
-# 3. OpenCode-Server starten (in einem separaten Terminal)
+# 3. OpenCode-Server starten (separates Terminal)
 opencode serve --port 4096
-#   → merkt euch das "server password …"
+#   → "server password …" merken
 
-# 4. Next.js-Dev-Server starten
+# 4. Dev-Server starten
 npm run dev
 # → http://localhost:3000
 ```
@@ -46,82 +50,58 @@ npm run dev
 | --- | --- |
 | `OPENCODE_BASE_URL` | Adresse des OpenCode-Servers (Standard: `http://127.0.0.1:4096`) |
 | `OPENCODE_PASSWORD` | Passwort aus der Serve-Ausgabe; Auth per Basic Auth (Benutzer `opencode`) |
-| `OPENCODE_WORKSPACE` | Arbeitsverzeichnis des Agents auf dem Server-Rechner (Standard: `standardprojekt-workspace`) |
+| `OPENCODE_WORKSPACE` | Optional: Arbeitsverzeichnis auf dem Server-Rechner (absoluter Pfad) |
 
 ## Deployment auf Vercel
 
-1. Projekt bei Vercel importieren (Git-Repository oder `vercel` CLI):
-
-   ```sh
-   npm install -g vercel
-   vercel login
-   vercel
-   ```
-
-2. Umgebungsvariablen in Vercel setzen (Dashboard → Project → Settings →
-   Environment Variables):
+1. Repository auf GitHub pushen und bei [vercel.com/new](https://vercel.com/new) importieren
+   (Framework wird automatisch als Next.js erkannt).
+2. Umgebungsvariablen im Vercel-Dashboard setzen:
    - `OPENCODE_BASE_URL` → öffentlich erreichbare Adresse deines OpenCode-Servers
-     (z. B. `https://opencode.deinedomain.de`)
-   - `OPENCODE_PASSWORD` → Passwort deines OpenCode-Servers
-   - `OPENCODE_WORKSPACE` → Arbeitsverzeichnis auf dem Server
-
-3. Wichtig: Der OpenCode-Server muss aus dem öffentlichen Internet erreichbar
-   sein. Sichere ihn zusätzlich ab (das Basic-Passwort ist die Mindestabsicherung).
+     (z. B. ein Cloudflare-Tunnel oder ein gehosteter Server)
+   - `OPENCODE_PASSWORD` → Passwort des OpenCode-Servers
+3. Deploy – fertig.
 
 ### Backend öffentlich erreichbar machen (Tunnel)
 
-Für Tests/Demos lässt sich der lokale Server bequem per Cloudflare Quick Tunnel
-öffentlich machen:
+Der OpenCode-Server läuft nicht auf Vercel (zustandsbehaftet). Für Tests/Demos:
 
 ```sh
 # cloudflared installieren (Windows: winget install Cloudflare.cloudflared)
 cloudflared tunnel --url http://127.0.0.1:4096
-# → gibt eine URL wie https://xxx.trycloudflare.com aus
+# → URL wie https://xxx.trycloudflare.com nutzen
 ```
 
-Diese URL als `OPENCODE_BASE_URL` in Vercel eintragen. Achtung: Die
-Quick-Tunnel-URL ist zufällig und ändert sich bei jedem Neustart des Tunnels.
-Für einen stabilen Produktivbetrieb einen benannten Tunnel (eigene Domain)
+Diese URL als `OPENCODE_BASE_URL` eintragen. Achtung: Quick-Tunnel-URLs ändern
+sich bei jedem Neustart. Für Produktion einen benannten Tunnel (eigene Domain)
 oder einen gehosteten Server verwenden.
 
-> ⚠️ Der Tunnel macht deinen OpenCode-Server öffentlich erreichbar. Wer das
-> Basic-Passwort kennt, kann darauf zugreifen. Verwende für echte Produktion
-> eine stärkere Absicherung (z. B. Reverse Proxy mit Auth oder ein VPN).
-
-> Hinweis: API-Routen sind mit `maxDuration = 300` (5 Minuten) konfiguriert.
-> Auf dem kostenlosen Vercel-Plan ist die Standardgrenze 60 s – kürzere
-> Agent-Antworten wählen oder [Fluid Compute](https://vercel.com/docs/functions/fluid-compute)
-> aktivieren.
+> ⚠️ Der Tunnel macht den Server öffentlich erreichbar – wer das Basic-Passwort
+> kennt, hat Zugriff. Für echte Produktion stärker absichern (Reverse Proxy mit
+> Auth o. ä.).
 
 ## API
 
-### `POST /api/chat`
-
-Body: `{ "prompt": "text", "sessionID": "optional" }`
-
-Antwort: NDJSON-Stream mit Zeilen:
-
-| Typ | Bedeutung |
+| Route | Beschreibung |
 | --- | --- |
-| `{"type":"session","sessionID":…}` | Session-ID (für Folge-Nachrichten wiederverwenden) |
-| `{"type":"text","delta":"…"}` | Text-Teil der Antwort |
-| `{"type":"reasoning","delta":"…"}` | Reasoning-Teil (wenn das Modell es liefert) |
-| `{"type":"tool","input":…}` | Aufgerufenes Tool |
-| `{"type":"toolresult","finished":true}` | Tool beendet |
-| `{"type":"done","error":…}` | Antwort fertig (optional mit Fehler) |
-| `{"type":"error","message":…}` | Fehler |
-
-### `GET /api/health`
-
-Prüft, ob der OpenCode-Server erreichbar ist (`200`/`503`).
+| `POST /api/generate` | Body `{ prompt, previousHtml?, modelID? }` → `{ html, model }` (One-Shot-Generierung) |
+| `GET /api/models` | Kostenlose Modelle des OpenCode-Servers (`{ models: [{ id, providerID, name }] }`) |
+| `GET /api/health` | Erreichbarkeit des OpenCode-Servers (`200`/`503`) |
 
 ## Projektstruktur
 
 ```
 app/
-  page.tsx            Chat-Oberfläche
-  api/chat/route.ts   Proxy zum OpenCode-Server (Streaming)
-  api/health/route.ts Gesundheitscheck
+  page.tsx              AppForge UI (Chat + Vorschau + Code)
+  api/generate/route.ts Code-Generierung via OpenCode (One-Shot)
+  api/models/route.ts   Kostenlose Modell-Liste
+  api/health/route.ts   Gesundheitscheck
 lib/
-  opencode.ts         Client-Wrapper (Basic Auth, Konfiguration)
+  opencode.ts           Client-Wrapper, Prompt-Bau & HTML-Extraktion
 ```
+
+## Sicherheit
+
+Generierte Ergebnisse laufen in einem sandboxed iframe
+(`allow-scripts allow-modals allow-forms`, ohne `allow-same-origin`), damit
+modell-generierter Code die App nicht verlassen kann.
