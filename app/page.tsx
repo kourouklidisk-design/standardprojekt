@@ -57,6 +57,8 @@ type Texts = {
   genFailHint: string; // Hinweis nach einem Generierungs-Crash (Sitzung wird frisch aufgebaut)
   gpuFailHint: string; // Tipp: GPU-Option deaktivieren
   gpuFallbackNote: string; // Chat-Hinweis beim automatischen WASM-Fallback nach GPU-Crash
+  emptyDiagNote: string; // Hinweistext: erzeugte Seite ist leer (weiße Vorschau)
+  emptyDiagFix: string; // Fix-Prompt bei leerer Seite
   previewHint: string;
   confirmNewChat: string;
   donePreview: string;
@@ -134,6 +136,10 @@ const TEXTS: Record<Lang, Texts> = {
       "Die fehlgeschlagene Modell-Sitzung wurde verworfen – der nächste Versuch baut sie frisch auf und läuft meist wieder. Einfach noch einmal senden oder „Fehler beheben“ klicken.",
     gpuFailHint: "Tipp: Deaktiviere oben die GPU-Option und versuche es erneut (WASM ist stabiler).",
     gpuFallbackNote: "⚠ GPU-Fehler während der Generierung – versuche automatisch mit WASM (CPU) neu …",
+    emptyDiagNote:
+      "Die Seite ist leer (kein sichtbarer Text, kein Eingabefeld, keine Buttons). Klicke „Fehler beheben“, damit das Modell die App sichtbar aufbaut.",
+    emptyDiagFix:
+      "Der letzte generierte Code ergibt eine leere, weiße Seite: kein sichtbarer Text, kein Eingabefeld, kein Button, keine Bedienelemente. Baue die angeforderte App komplett und sichtbar auf (mit Eingabefeld, Buttons und Liste bzw. passenden UI-Elementen) und gib die komplette, lauffähige HTML-Datei zurück.",
     previewDiagLabel: "⚠ Vorschau-Diagnose: ",
     previewDiagIds:
       "Diese Element-ID wird im JavaScript verwendet, existiert aber nicht im HTML: {ids}. Klicke „Fehler beheben“, damit das Modell das fehlende Element ergänzt.",
@@ -213,6 +219,10 @@ Regeln:
       "The failed model session was discarded – the next attempt rebuilds it fresh and usually works. Simply send again or click “Fix error”.",
     gpuFailHint: "Tip: disable the GPU option above and try again (WASM is more stable).",
     gpuFallbackNote: "⚠ GPU error during generation – automatically retrying with WASM (CPU) …",
+    emptyDiagNote:
+      "The page is empty (no visible text, no input field, no buttons). Click “Fix error” so the model builds a visible app.",
+    emptyDiagFix:
+      "The last generated code results in an empty, blank page: no visible text, no input field, no button, no controls. Build the requested app completely and visibly (with input field, buttons and list or fitting UI elements) and return the complete, working HTML file.",
     previewDiagLabel: "⚠ Preview diagnostic: ",
     previewDiagIds:
       "This element ID is used by the JavaScript but is missing from the HTML: {ids}. Click “Fix error” so the model adds the missing element.",
@@ -292,6 +302,10 @@ Rules:
       "Η αποτυχημένη συνεδρία του μοντέλου απορρίφθηκε – η επόμενη προσπάθεια τη δημιουργεί από την αρχή και συνήθως λειτουργεί. Απλώς στείλε ξανά ή κάνε κλικ στο „Διόρθωση σφάλματος“.",
     gpuFailHint: "Συμβουλή: Απενεργοποίησε την επιλογή GPU και δοκίμασε ξανά (το WASM είναι πιο σταθερό).",
     gpuFallbackNote: "⚠ Σφάλμα GPU κατά τη δημιουργία – γίνεται αυτόματη επανάληψη με WASM (CPU) …",
+    emptyDiagNote:
+      "Η σελίδα είναι κενή (κανένα ορατό κείμενο, κανένα πεδίο εισαγωγής, κανένα κουμπί). Κάνε κλικ στο „Διόρθωση σφάλματος“ για να φτιάξει το μοντέλο μια εμφανή εφαρμογή.",
+    emptyDiagFix:
+      "Ο τελευταίος κώδικας δίνει μια κενή, λευκή σελίδα: κανένα ορατό κείμενο, κανένα πεδίο εισαγωγής, κανένα κουμπί, κανένα στοιχείο ελέγχου. Φτιάξε την εφαρμογή που ζητήθηκε πλήρως και εμφανώς (με πεδίο εισαγωγής, κουμπιά και λίστα ή κατάλληλα στοιχεία UI) και επέστρεψε το πλήρες, λειτουργικό αρχείο HTML.",
     previewDiagLabel: "⚠ Διάγνωση προεπισκόπησης: ",
     previewDiagIds:
       "Αυτό το αναγνωριστικό στοιχείου χρησιμοποιείται από την JavaScript αλλά λείπει από το HTML: {ids}. Κάνε κλικ στο „Διόρθωση σφάλματος“ για να προσθέσει το μοντέλο το στοιχείο που λείπει.",
@@ -370,6 +384,10 @@ Rules:
       "失敗したモデルセッションは破棄されました – 次の試行で新しく構築され、通常は再び動作します。もう一度送信するか、「エラーを修正」をクリックしてください。",
     gpuFailHint: "ヒント: 上記の GPU オプションを無効にして再試行してください（WASM の方が安定しています）。",
     gpuFallbackNote: "⚠ 生成中に GPU エラーが発生しました – WASM（CPU）で自動的に再試行しています…",
+    emptyDiagNote:
+      "ページが空です（表示されるテキスト、入力フィールド、ボタンがありません）。「エラーを修正」をクリックすると、モデルが目に見えるアプリを作成します。",
+    emptyDiagFix:
+      "最後に生成されたコードは、空の白いページになっています: 表示されるテキスト、入力フィールド、ボタン、操作要素がありません。要求されたアプリを完全かつ目に見える形で（入力フィールド、ボタン、リスト、または適切な UI 要素を使って）構築し、完全に動作する HTML ファイルを返してください。",
     previewDiagLabel: "⚠ プレビュー診断: ",
     previewDiagIds:
       "この要素 ID は JavaScript で使われていますが、HTML に存在しません: {ids}。「エラーを修正」をクリックすると、モデルが不足している要素を追加します。",
@@ -448,6 +466,10 @@ Rules:
       "失败的模型会话已被丢弃 – 下次尝试会重新构建，通常即可正常运行。请再次发送或点击“修复错误”。",
     gpuFailHint: "提示：请停用上方的 GPU 选项后重试（WASM 更稳定）。",
     gpuFallbackNote: "⚠ 生成期间出现 GPU 错误 – 正在自动改用 WASM（CPU）重试…",
+    emptyDiagNote:
+      "页面为空（没有可见文本、输入框或按钮）。点击“修复错误”，模型将构建一个可见的应用。",
+    emptyDiagFix:
+      "最后生成的代码产生了一个空白的页面：没有可见文本、输入框、按钮或控件。请完整、可视化地构建所要求的应用（包含输入框、按钮和列表或合适的 UI 元素），并返回完整、可正常运行的 HTML 文件。",
     previewDiagLabel: "⚠ 预览诊断：",
     previewDiagIds:
       "此元素 ID 在 JavaScript 中使用，但 HTML 中不存在：{ids}。点击“修复错误”，模型会补充缺失的元素。",
@@ -526,6 +548,10 @@ Rules:
       "विफल मॉडल सत्र को हटा दिया गया है – अगला प्रयास इसे नए सिरे से बनाता है और आमतौर पर काम करता है। बस फिर से भेजें या „त्रुटि ठीक करें“ पर क्लिक करें।",
     gpuFailHint: "सुझाव: ऊपर GPU विकल्प बंद करके दोबारा प्रयास करें (WASM अधिक स्थिर है)।",
     gpuFallbackNote: "⚠ जनरेशन के दौरान GPU त्रुटि – WASM (CPU) के साथ स्वचालित रूप से पुनः प्रयास किया जा रहा है…",
+    emptyDiagNote:
+      "पेज खाली है (कोई दृश्यमान टेक्स्ट, कोई इनपुट फ़ील्ड, कोई बटन नहीं)। „त्रुटि ठीक करें“ पर क्लिक करें ताकि मॉडल एक दृश्यमान ऐप बनाए।",
+    emptyDiagFix:
+      "पिछले जनरेट किए गए कोड से एक खाली, सफेद पेज बनता है: कोई दृश्यमान टेक्स्ट, कोई इनपुट फ़ील्ड, कोई बटन, कोई नियंत्रण नहीं। मांगी गई ऐप को पूरी और दृश्यमान रूप से बनाएं (इनपुट फ़ील्ड, बटन और सूची या उपयुक्त UI तत्वों के साथ) और पूरी, काम करने वाली HTML फ़ाइल लौटाएं।",
     previewDiagLabel: "⚠ पूर्वावलोकन निदान: ",
     previewDiagIds:
       "यह एलिमेंट ID JavaScript में उपयोग होती है, लेकिन HTML में मौजूद नहीं है: {ids}। „त्रुटि ठीक करें“ पर क्लिक करें ताकि मॉडल लापता एलिमेंट जोड़ दे।",
@@ -605,6 +631,10 @@ Rules:
       "La session de modèle ayant échoué a été supprimée – la prochaine tentative la reconstruit et fonctionne généralement. Il suffit de renvoyer ou de cliquer sur « Corriger l'erreur ».",
     gpuFailHint: "Astuce : désactivez l'option GPU ci-dessus et réessayez (WASM est plus stable).",
     gpuFallbackNote: "⚠ Erreur GPU pendant la génération – nouvelle tentative automatique avec WASM (CPU) …",
+    emptyDiagNote:
+      "La page est vide (aucun texte visible, aucun champ de saisie, aucun bouton). Cliquez sur « Corriger l'erreur » pour que le modèle crée une application visible.",
+    emptyDiagFix:
+      "Le dernier code généré donne une page vide et blanche : aucun texte visible, aucun champ de saisie, aucun bouton, aucun élément de contrôle. Construis l'application demandée de manière complète et visible (avec champ de saisie, boutons et liste ou éléments d'interface appropriés) et renvoie le fichier HTML complet et fonctionnel.",
     previewDiagLabel: "⚠ Diagnostic de l'aperçu : ",
     previewDiagIds:
       "Cet ID d'élément est utilisé par le JavaScript mais est absent du HTML : {ids}. Cliquez sur « Corriger l'erreur » pour que le modèle ajoute l'élément manquant.",
@@ -684,6 +714,10 @@ Règles :
       "La sesión de modelo fallida se ha descartado: el siguiente intento la reconstruye desde cero y suele funcionar. Simplemente envía de nuevo o haz clic en « Corregir error ».",
     gpuFailHint: "Consejo: desactiva la opción de GPU de arriba y vuelve a intentarlo (WASM es más estable).",
     gpuFallbackNote: "⚠ Error de GPU durante la generación: reintentando automáticamente con WASM (CPU) …",
+    emptyDiagNote:
+      "La página está vacía (sin texto visible, sin campo de entrada, sin botones). Haz clic en « Corregir error » para que el modelo construya una aplicación visible.",
+    emptyDiagFix:
+      "El último código generado produce una página vacía y en blanco: sin texto visible, sin campo de entrada, sin botones, sin controles. Construye la aplicación solicitada de forma completa y visible (con campo de entrada, botones y lista o elementos de interfaz adecuados) y devuelve el archivo HTML completo y funcional.",
     previewDiagLabel: "⚠ Diagnóstico de la vista previa: ",
     previewDiagIds:
       "Este ID de elemento lo usa el JavaScript, pero no existe en el HTML: {ids}. Haz clic en « Corregir error » para que el modelo añada el elemento que falta.",
@@ -763,6 +797,10 @@ Reglas:
       "Kika cha mfano kilichoshindwa kimetupwa – jaribio linalofuata linajenga upya na kwa kawaida hufanya kazi. Tuma tena au bofya „Sahihisha hitilafu“.",
     gpuFailHint: "Kidokezo: zima chaguo la GPU hapo juu na ujaribu tena (WASM ni thabiti zaidi).",
     gpuFallbackNote: "⚠ Hitilafu ya GPU wakati wa utengenezaji – inajaribu tena kiotomatiki kwa WASM (CPU) …",
+    emptyDiagNote:
+      "Ukurasa ni tupu (hakuna maandishi yanayoonekana, hakuna sehemu ya kuingiza, hakuna vitufe). Bofya „Sahihisha hitilafu“ ili muundo uunde programu inayoonekana.",
+    emptyDiagFix:
+      "Msimbo wa mwisho uliozalishwa unatoa ukurasa tupu na mweupe: hakuna maandishi yanayoonekana, hakuna sehemu ya kuingiza, hakuna kitufe, hakuna vidhibiti. Jenga programu iliyoombwa kikamilifu na inayoonekana (kwa sehemu ya kuingiza, vitufe na orodha au vipengele vinavyofaa vya UI) na urudishe faili kamili la HTML linalofanya kazi.",
     previewDiagLabel: "⚠ Utambuzi wa onyesho: ",
     previewDiagIds:
       "Kitambulisho hiki cha kipengele kinatumiwa na JavaScript lakini hakipo kwenye HTML: {ids}. Bofya „Sahihisha hitilafu“ ili muundo uongeze kipengele kinachokosekana.",
@@ -842,6 +880,10 @@ Sheria:
       "La sessione del modello non riuscita è stata scartata: il prossimo tentativo la ricostruisce da zero e di solito funziona. Basta inviare di nuovo o cliccare su « Correggi errore ».",
     gpuFailHint: "Suggerimento: disattiva l'opzione GPU qui sopra e riprova (WASM è più stabile).",
     gpuFallbackNote: "⚠ Errore GPU durante la generazione – riprovo automaticamente con WASM (CPU) …",
+    emptyDiagNote:
+      "La pagina è vuota (nessun testo visibile, nessun campo di inserimento, nessun pulsante). Clicca su « Correggi errore » per far creare al modello un'applicazione visibile.",
+    emptyDiagFix:
+      "L'ultimo codice generato produce una pagina vuota e bianca: nessun testo visibile, nessun campo di inserimento, nessun pulsante, nessun controllo. Costruisci l'app richiesta in modo completo e visibile (con campo di inserimento, pulsanti ed elenco o elementi UI appropriati) e restituisci il file HTML completo e funzionante.",
     previewDiagLabel: "⚠ Diagnosi dell'anteprima: ",
     previewDiagIds:
       "Questo ID di elemento è usato dal JavaScript ma non esiste nell'HTML: {ids}. Clicca su « Correggi errore » per far aggiungere al modello l'elemento mancante.",
@@ -920,6 +962,10 @@ Regole:
       "Başarısız model oturumu atıldı – bir sonraki deneme onu sıfırdan oluşturur ve genellikle çalışır. Tekrar gönderin veya „Hatayı düzelt“e tıklayın.",
     gpuFailHint: "İpucu: Yukarıdaki GPU seçeneğini kapatıp tekrar deneyin (WASM daha stabildir).",
     gpuFallbackNote: "⚠ Oluşturma sırasında GPU hatası – WASM (CPU) ile otomatik yeniden deneniyor…",
+    emptyDiagNote:
+      "Sayfa boş (görünür metin, giriş alanı veya düğme yok). Modelin görünür bir uygulama oluşturması için „Hatayı düzelt“e tıklayın.",
+    emptyDiagFix:
+      "Son oluşturulan kod boş, beyaz bir sayfa oluşturuyor: görünür metin yok, giriş alanı yok, düğme yok, kontrol öğesi yok. İstenen uygulamayı eksiksiz ve görünür şekilde (giriş alanı, düğmeler ve liste veya uygun UI öğeleriyle) oluştur ve eksiksiz, çalışan HTML dosyasını geri döndür.",
     previewDiagLabel: "⚠ Önizleme teşhisi: ",
     previewDiagIds:
       "Bu öğe Kimliği JavaScript tarafından kullanılıyor ancak HTML'de yok: {ids}. Modelin eksik öğeyi eklemesi için „Hatayı düzelt“e tıklayın.",
@@ -1076,6 +1122,15 @@ function analyzeMissingIds(html: string): string[] {
   return missing;
 }
 
+/** Erkennt „leere" Seiten: kein sichtbarer Text, kein Eingabefeld, kein Button,
+ *  kein Canvas – dann bleibt die Vorschau weiß und die App wirkt nicht erstellt. */
+function assessEmptyPreview(html: string): boolean {
+  const body = html.replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "");
+  const text = body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const hasControl = /<(button|input|textarea|select|a\b|canvas)\b/i.test(body);
+  return text.length < 8 && !hasControl;
+}
+
 /** Baut den Nutzer-Task inkl. bisherigem Code für Verbesserungen. */
 function buildTaskPrompt(userPrompt: string, previousHtml: string | undefined, prevIntro: string): string {
   let prompt = userPrompt;
@@ -1162,6 +1217,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [previewDiag, setPreviewDiag] = useState<string[] | null>(null); // fehlende Element-IDs
+  const [previewEmpty, setPreviewEmpty] = useState(false); // leere/weiße Seite erkannt
   const [genProgress, setGenProgress] = useState<GenProgress | null>(null);
   const [genStartAt, setGenStartAt] = useState<number | null>(null);
   const [, setTick] = useState(0); // löst Re-Render für den Sekunden-Zähler aus
@@ -1282,8 +1338,9 @@ export default function Home() {
       const d = e.data as { type?: string; msg?: unknown } | undefined;
       if (d && d.type === "aicoder-preview-error") {
         setPreviewError(String(d.msg ?? "").replace(/^Error:\s*/i, "").slice(0, 300));
-        // Ein echte Laufzeit-Fehlermeldung ersetzt die statische Diagnose.
+        // Eine echte Laufzeit-Fehlermeldung ersetzt die statische Diagnose.
         setPreviewDiag(null);
+        setPreviewEmpty(false);
       }
     };
     window.addEventListener("message", onMsg);
@@ -1451,6 +1508,7 @@ export default function Home() {
     setGenProgress({ pct: 0, etaSec: null, tokens: 0 });
     setPreviewError(null);
     setPreviewDiag(null);
+    setPreviewEmpty(false);
     streamRef.current = { content: "" };
 
     // Führt die eigentliche Generierung aus (Modell laden, streamen, auswerten).
@@ -1545,7 +1603,14 @@ export default function Home() {
       setPreviewHtml(asCode ? html : "");
       // Statische Diagnose: fehlende Element-IDs sind der häufigste Modell-Bug und
       // würden erst beim Klicken crashen – das jetzt schon melden (fixfähig).
-      if (asCode) setPreviewDiag(analyzeMissingIds(html));
+      // Ebenso: komplett leere Seiten (weiße Vorschau) sofort als Diagnose melden.
+      if (asCode) {
+        const diagIds = analyzeMissingIds(html);
+        setPreviewDiag(diagIds.length > 0 ? diagIds : null);
+        setPreviewEmpty(assessEmptyPreview(html));
+      } else {
+        setPreviewEmpty(false);
+      }
       updateAssistant(assistantMsg.id, {
         streaming: false,
         content: asCode
@@ -1608,9 +1673,13 @@ export default function Home() {
   }
 
   // „Fehler beheben": schickt den Vorschau-Fehler bzw. die Diagnose (fehlende
-  // Element-IDs) + den bisherigen Code an das Modell zur Korrektur.
+  // Element-IDs / leere Seite) + den bisherigen Code an das Modell zur Korrektur.
   function fixPreviewError() {
     if (busy) return;
+    if (previewEmpty) {
+      handleSend(undefined, `${T.emptyDiagFix}\n\n${previewError ?? ""}`);
+      return;
+    }
     if (previewDiag && previewDiag.length > 0) {
       const ids = previewDiag.join(", ");
       handleSend(undefined, `${T.diagFixIntro.replace("{ids}", ids)}\n\n${previewError ?? ""}`);
@@ -1626,6 +1695,7 @@ export default function Home() {
     setPreviewHtml("");
     setPreviewError(null);
     setPreviewDiag(null);
+    setPreviewEmpty(false);
     setInput("");
     setView("preview");
     setMobileTab("chat");
@@ -1881,7 +1951,19 @@ export default function Home() {
               </div>
             ) : view === "preview" ? (
               <>
-                {previewDiag && previewDiag.length > 0 && (
+                {previewEmpty && (
+                  <div className="preview-error-note preview-diag-note">
+                    <span>{T.previewDiagLabel}</span>
+                    <code>{T.emptyDiagNote}</code>
+                    <button onClick={fixPreviewError} disabled={busy} className="preview-error-fix">
+                      {T.fixButton}
+                    </button>
+                    <button onClick={() => setPreviewEmpty(false)} title="✕" className="preview-error-close">
+                      ✕
+                    </button>
+                  </div>
+                )}
+                {!previewEmpty && previewDiag && previewDiag.length > 0 && (
                   <div className="preview-error-note preview-diag-note">
                     <span>{T.previewDiagLabel}</span>
                     <code>{T.previewDiagIds.replace("{ids}", previewDiag.join(", "))}</code>
