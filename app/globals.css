@@ -513,6 +513,28 @@ form button:disabled {
   border-radius: 6px;
 }
 
+.preview-error-fix {
+  flex-shrink: 0;
+  background: #8b2435;
+  border: 1px solid #b13a4d;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.preview-error-fix:hover {
+  background: #a02c40;
+}
+
+.preview-error-fix:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .preview-error-close:hover {
   background: rgba(255, 179, 173, 0.15);
 }

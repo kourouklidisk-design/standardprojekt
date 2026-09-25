@@ -49,6 +49,8 @@ type Texts = {
   downloadTitle: string;
   previewEmpty: string;
   previewErrorLabel: string; // Vorspann der Skriptfehler-Meldung in der Vorschau
+  fixPromptIntro: string; // Einleitung des Auto-Fix-Prompts (Vorschau-Fehler wird angehängt)
+  fixButton: string; // Label der „Fehler beheben"-Schaltfläche
   previewHint: string;
   confirmNewChat: string;
   donePreview: string;
@@ -119,6 +121,9 @@ const TEXTS: Record<Lang, Texts> = {
     downloadTitle: "index.html herunterladen",
     previewEmpty: "Dein Ergebnis erscheint hier – live während die KI den Code schreibt.",
     previewErrorLabel: "⚠ Skriptfehler in der Vorschau: ",
+    fixPromptIntro:
+      "Der letzte generierte Code verursacht in der Vorschau diesen Fehler – korrigiere ihn und gib die komplette, lauffähige HTML-Datei zurück. Fehler:",
+    fixButton: "🔧 Fehler beheben",
     previewHint: "Läuft komplett auf deinem Gerät – kein Server, kein API-Key.",
     confirmNewChat: "Aktuellen Chat wirklich löschen?",
     donePreview: "✔ Fertig – deine App ist in der Vorschau.",
@@ -186,6 +191,9 @@ Regeln:
     downloadTitle: "Download index.html",
     previewEmpty: "Your result appears here – live while the AI writes the code.",
     previewErrorLabel: "⚠ Script error in preview: ",
+    fixPromptIntro:
+      "The last generated code causes this error in the preview – fix it and return the complete, working HTML file. Error:",
+    fixButton: "🔧 Fix error",
     previewHint: "Runs entirely on your device – no server, no API key.",
     confirmNewChat: "Really delete the current chat?",
     donePreview: "✔ Done – your app is in the preview.",
@@ -253,6 +261,9 @@ Rules:
     downloadTitle: "Λήψη index.html",
     previewEmpty: "Το αποτέλεσμά σου εμφανίζεται εδώ – ζωντανά όσο η AI γράφει τον κώδικα.",
     previewErrorLabel: "⚠ Σφάλμα σεναρίου στην προεπισκόπηση: ",
+    fixPromptIntro:
+      "Ο τελευταίος κώδικας που δημιουργήθηκε προκαλεί αυτό το σφάλμα στην προεπισκόπηση – διόρθωσέ το και επέστρεψε το πλήρες, λειτουργικό αρχείο HTML. Σφάλμα:",
+    fixButton: "🔧 Διόρθωση σφάλματος",
     previewHint: "Τρέχει εξ ολοκλήρου στη συσκευή σου – χωρίς server, χωρίς API key.",
     confirmNewChat: "Θέλεις σίγουρα να διαγράψεις τη συνομιλία;",
     donePreview: "✔ Έτοιμο – η εφαρμογή σου είναι στην προεπισκόπηση.",
@@ -319,6 +330,9 @@ Rules:
     downloadTitle: "index.htmlをダウンロード",
     previewEmpty: "AIがコードを書いている間、ここに結果がライブ表示されます。",
     previewErrorLabel: "⚠ プレビューのスクリプトエラー: ",
+    fixPromptIntro:
+      "最後に生成されたコードがプレビューでこのエラーを引き起こしています – 修正して、完全に動作する HTML ファイルを返してください。エラー:",
+    fixButton: "🔧 エラーを修正",
     previewHint: "すべてお使いのデバイス上で実行 – サーバー不要、APIキー不要。",
     confirmNewChat: "現在のチャットを削除しますか？",
     donePreview: "✔ 完了 – アプリはプレビューにあります。",
@@ -385,6 +399,9 @@ Rules:
     downloadTitle: "下载 index.html",
     previewEmpty: "你的结果会在这里实时显示——AI 编写代码的同时。",
     previewErrorLabel: "⚠ 预览脚本错误：",
+    fixPromptIntro:
+      "最后生成的代码在预览中引发了此错误 – 请修复它并返回完整的、可正常运行的 HTML 文件。错误：",
+    fixButton: "🔧 修复错误",
     previewHint: "完全在你的设备上运行——无需服务器、无需 API 密钥。",
     confirmNewChat: "确定要删除当前聊天吗？",
     donePreview: "✔ 完成——你的应用已在预览中。",
@@ -451,6 +468,9 @@ Rules:
     downloadTitle: "index.html डाउनलोड करें",
     previewEmpty: "आपका परिणाम यहाँ दिखाई देगा – AI कोड लिखते समय लाइव।",
     previewErrorLabel: "⚠ पूर्वावलोकन में स्क्रिप्ट त्रुटि: ",
+    fixPromptIntro:
+      "पिछले जनरेट किए गए कोड से पूर्वावलोकन में यह त्रुटि हो रही है – इसे ठीक करें और पूरी, काम करने वाली HTML फ़ाइल लौटाएं। त्रुटि:",
+    fixButton: "🔧 त्रुटि ठीक करें",
     previewHint: "पूरी तरह आपके डिवाइस पर चलता है – न कोई सर्वर, न API कुंजी।",
     confirmNewChat: "क्या आप वाकई वर्तमान चैट हटाना चाहते हैं?",
     donePreview: "✔ हो गया – आपका ऐप पूर्वावलोकन में है।",
@@ -518,6 +538,9 @@ Rules:
     downloadTitle: "Télécharger index.html",
     previewEmpty: "Ton résultat apparaît ici – en direct pendant que l'IA écrit le code.",
     previewErrorLabel: "⚠ Erreur de script dans l'aperçu : ",
+    fixPromptIntro:
+      "Le dernier code généré provoque cette erreur dans l'aperçu – corrige-la et renvoie le fichier HTML complet et fonctionnel. Erreur :",
+    fixButton: "🔧 Corriger l'erreur",
     previewHint: "Fonctionne entièrement sur ton appareil – sans serveur, sans clé API.",
     confirmNewChat: "Vraiment supprimer la discussion actuelle ?",
     donePreview: "✔ Terminé – ton application est dans l'aperçu.",
@@ -585,6 +608,9 @@ Règles :
     downloadTitle: "Descargar index.html",
     previewEmpty: "Tu resultado aparece aquí – en vivo mientras la IA escribe el código.",
     previewErrorLabel: "⚠ Error de script en la vista previa: ",
+    fixPromptIntro:
+      "El último código generado provoca este error en la vista previa: corrígelo y devuelve el archivo HTML completo y funcional. Error:",
+    fixButton: "🔧 Corregir error",
     previewHint: "Funciona por completo en tu dispositivo – sin servidor, sin clave API.",
     confirmNewChat: "¿Seguro que quieres borrar el chat actual?",
     donePreview: "✔ Listo – tu aplicación está en la vista previa.",
@@ -652,6 +678,9 @@ Reglas:
     downloadTitle: "Pakua index.html",
     previewEmpty: "Matokeo yako yataonekana hapa – moja kwa moja huku AI ikiandika msimbo.",
     previewErrorLabel: "⚠ Hitilafu ya hati katika onyesho: ",
+    fixPromptIntro:
+      "Msimbo wa mwisho uliozalishwa unasababisha hitilafu hii katika onyesho – lisahihishe na urudishe faili kamili la HTML linalofanya kazi. Hitilafu:",
+    fixButton: "🔧 Sahihisha hitilafu",
     previewHint: "Yanaendelea kabisa kwenye kifaa chako – hakuna seva, hakuna ufunguo wa API.",
     confirmNewChat: "Kweli unataka kufuta mazungumzo ya sasa?",
     donePreview: "✔ Imekamilika – programu yako iko kwenye hakiki.",
@@ -719,6 +748,9 @@ Sheria:
     downloadTitle: "Scarica index.html",
     previewEmpty: "Il tuo risultato appare qui – in tempo reale mentre l'IA scrive il codice.",
     previewErrorLabel: "⚠ Errore di script nell'anteprima: ",
+    fixPromptIntro:
+      "L'ultimo codice generato causa questo errore nell'anteprima – correggilo e restituisci il file HTML completo e funzionante. Errore:",
+    fixButton: "🔧 Correggi errore",
     previewHint: "Gira interamente sul tuo dispositivo – niente server, niente chiave API.",
     confirmNewChat: "Vuoi davvero eliminare la chat attuale?",
     donePreview: "✔ Fatto – la tua app è nell'anteprima.",
@@ -785,6 +817,9 @@ Regole:
     downloadTitle: "index.html indir",
     previewEmpty: "Sonucun burada görünür – yapay zekâ kodu yazarken canlı olarak.",
     previewErrorLabel: "⚠ Önizlemede betik hatası: ",
+    fixPromptIntro:
+      "Son oluşturulan kod önizlemede şu hataya neden oluyor – hatayı düzelt ve eksiksiz, çalışan HTML dosyasını geri döndür. Hata:",
+    fixButton: "🔧 Hatayı düzelt",
     previewHint: "Tamamen cihazında çalışır – sunucu yok, API anahtarı yok.",
     confirmNewChat: "Mevcut sohbeti gerçekten silmek istiyor musun?",
     donePreview: "✔ Tamam – uygulaman önizlemede.",
@@ -1246,9 +1281,9 @@ export default function Home() {
     return prom;
   }
 
-  async function handleSend(e?: FormEvent) {
+  async function handleSend(e?: FormEvent, forcedPrompt?: string) {
     e?.preventDefault();
-    const prompt = input.trim();
+    const prompt = (forcedPrompt ?? input).trim();
     if (!prompt || busy) return;
     setInput("");
     setMobileTab("chat");
@@ -1356,6 +1391,13 @@ export default function Home() {
       setGenProgress(null);
       setGenStartAt(null);
     }
+  }
+
+  // „Fehler beheben": schickt den Vorschau-Fehler + den bisherigen Code an das Modell,
+  // damit es seinen eigenen Bug korrigiert (nutzt handleSend mit erzwungenem Prompt).
+  function fixPreviewError() {
+    if (!previewError || busy) return;
+    handleSend(undefined, `${T.fixPromptIntro}\n\n${previewError}`);
   }
 
   function newChat() {
@@ -1621,6 +1663,9 @@ export default function Home() {
                   <div className="preview-error-note">
                     <span>{T.previewErrorLabel}</span>
                     <code>{previewError}</code>
+                    <button onClick={fixPreviewError} disabled={busy} className="preview-error-fix">
+                      {T.fixButton}
+                    </button>
                     <button onClick={() => setPreviewError(null)} title="✕" className="preview-error-close">
                       ✕
                     </button>
