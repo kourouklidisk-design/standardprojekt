@@ -48,6 +48,7 @@ type Texts = {
   copyTitle: string;
   downloadTitle: string;
   previewEmpty: string;
+  previewErrorLabel: string; // Vorspann der Skriptfehler-Meldung in der Vorschau
   previewHint: string;
   confirmNewChat: string;
   donePreview: string;
@@ -117,6 +118,7 @@ const TEXTS: Record<Lang, Texts> = {
     copyTitle: "Code kopieren",
     downloadTitle: "index.html herunterladen",
     previewEmpty: "Dein Ergebnis erscheint hier – live während die KI den Code schreibt.",
+    previewErrorLabel: "⚠ Skriptfehler in der Vorschau: ",
     previewHint: "Läuft komplett auf deinem Gerät – kein Server, kein API-Key.",
     confirmNewChat: "Aktuellen Chat wirklich löschen?",
     donePreview: "✔ Fertig – deine App ist in der Vorschau.",
@@ -183,6 +185,7 @@ Regeln:
     copyTitle: "Copy code",
     downloadTitle: "Download index.html",
     previewEmpty: "Your result appears here – live while the AI writes the code.",
+    previewErrorLabel: "⚠ Script error in preview: ",
     previewHint: "Runs entirely on your device – no server, no API key.",
     confirmNewChat: "Really delete the current chat?",
     donePreview: "✔ Done – your app is in the preview.",
@@ -249,6 +252,7 @@ Rules:
     copyTitle: "Αντιγραφή κώδικα",
     downloadTitle: "Λήψη index.html",
     previewEmpty: "Το αποτέλεσμά σου εμφανίζεται εδώ – ζωντανά όσο η AI γράφει τον κώδικα.",
+    previewErrorLabel: "⚠ Σφάλμα σεναρίου στην προεπισκόπηση: ",
     previewHint: "Τρέχει εξ ολοκλήρου στη συσκευή σου – χωρίς server, χωρίς API key.",
     confirmNewChat: "Θέλεις σίγουρα να διαγράψεις τη συνομιλία;",
     donePreview: "✔ Έτοιμο – η εφαρμογή σου είναι στην προεπισκόπηση.",
@@ -314,6 +318,7 @@ Rules:
     copyTitle: "コードをコピー",
     downloadTitle: "index.htmlをダウンロード",
     previewEmpty: "AIがコードを書いている間、ここに結果がライブ表示されます。",
+    previewErrorLabel: "⚠ プレビューのスクリプトエラー: ",
     previewHint: "すべてお使いのデバイス上で実行 – サーバー不要、APIキー不要。",
     confirmNewChat: "現在のチャットを削除しますか？",
     donePreview: "✔ 完了 – アプリはプレビューにあります。",
@@ -379,6 +384,7 @@ Rules:
     copyTitle: "复制代码",
     downloadTitle: "下载 index.html",
     previewEmpty: "你的结果会在这里实时显示——AI 编写代码的同时。",
+    previewErrorLabel: "⚠ 预览脚本错误：",
     previewHint: "完全在你的设备上运行——无需服务器、无需 API 密钥。",
     confirmNewChat: "确定要删除当前聊天吗？",
     donePreview: "✔ 完成——你的应用已在预览中。",
@@ -444,6 +450,7 @@ Rules:
     copyTitle: "कोड कॉपी करें",
     downloadTitle: "index.html डाउनलोड करें",
     previewEmpty: "आपका परिणाम यहाँ दिखाई देगा – AI कोड लिखते समय लाइव।",
+    previewErrorLabel: "⚠ पूर्वावलोकन में स्क्रिप्ट त्रुटि: ",
     previewHint: "पूरी तरह आपके डिवाइस पर चलता है – न कोई सर्वर, न API कुंजी।",
     confirmNewChat: "क्या आप वाकई वर्तमान चैट हटाना चाहते हैं?",
     donePreview: "✔ हो गया – आपका ऐप पूर्वावलोकन में है।",
@@ -510,6 +517,7 @@ Rules:
     copyTitle: "Copier le code",
     downloadTitle: "Télécharger index.html",
     previewEmpty: "Ton résultat apparaît ici – en direct pendant que l'IA écrit le code.",
+    previewErrorLabel: "⚠ Erreur de script dans l'aperçu : ",
     previewHint: "Fonctionne entièrement sur ton appareil – sans serveur, sans clé API.",
     confirmNewChat: "Vraiment supprimer la discussion actuelle ?",
     donePreview: "✔ Terminé – ton application est dans l'aperçu.",
@@ -576,6 +584,7 @@ Règles :
     copyTitle: "Copiar código",
     downloadTitle: "Descargar index.html",
     previewEmpty: "Tu resultado aparece aquí – en vivo mientras la IA escribe el código.",
+    previewErrorLabel: "⚠ Error de script en la vista previa: ",
     previewHint: "Funciona por completo en tu dispositivo – sin servidor, sin clave API.",
     confirmNewChat: "¿Seguro que quieres borrar el chat actual?",
     donePreview: "✔ Listo – tu aplicación está en la vista previa.",
@@ -642,6 +651,7 @@ Reglas:
     copyTitle: "Nakili msimbo",
     downloadTitle: "Pakua index.html",
     previewEmpty: "Matokeo yako yataonekana hapa – moja kwa moja huku AI ikiandika msimbo.",
+    previewErrorLabel: "⚠ Hitilafu ya hati katika onyesho: ",
     previewHint: "Yanaendelea kabisa kwenye kifaa chako – hakuna seva, hakuna ufunguo wa API.",
     confirmNewChat: "Kweli unataka kufuta mazungumzo ya sasa?",
     donePreview: "✔ Imekamilika – programu yako iko kwenye hakiki.",
@@ -708,6 +718,7 @@ Sheria:
     copyTitle: "Copia il codice",
     downloadTitle: "Scarica index.html",
     previewEmpty: "Il tuo risultato appare qui – in tempo reale mentre l'IA scrive il codice.",
+    previewErrorLabel: "⚠ Errore di script nell'anteprima: ",
     previewHint: "Gira interamente sul tuo dispositivo – niente server, niente chiave API.",
     confirmNewChat: "Vuoi davvero eliminare la chat attuale?",
     donePreview: "✔ Fatto – la tua app è nell'anteprima.",
@@ -773,6 +784,7 @@ Regole:
     copyTitle: "Kodu kopyala",
     downloadTitle: "index.html indir",
     previewEmpty: "Sonucun burada görünür – yapay zekâ kodu yazarken canlı olarak.",
+    previewErrorLabel: "⚠ Önizlemede betik hatası: ",
     previewHint: "Tamamen cihazında çalışır – sunucu yok, API anahtarı yok.",
     confirmNewChat: "Mevcut sohbeti gerçekten silmek istiyor musun?",
     donePreview: "✔ Tamam – uygulaman önizlemede.",
@@ -813,6 +825,38 @@ const BROWSER_MODELS: BrowserModel[] = [
 const DEFAULT_MODEL = BROWSER_MODELS[0].id;
 const STORAGE_KEY = "ai-coder.v2";
 const MAX_TOKENS = 2048;
+
+// Prolog für die Vorschau-Iframe. Zwei Aufgaben:
+// 1) localStorage/sessionStorage-Ersatz, falls das iframe keine gleiche Origin hat –
+//    sonst bricht ein Highscore-/Speicher-Zugriff das komplette Spiel-Skript ab
+//    („Start"-Button tut dann nichts).
+// 2) Skriptfehler in der Vorschau an die App melden (wird über dem iframe angezeigt).
+const PREVIEW_SHIM = `
+<script>
+(function(){
+  function shim(prop){
+    try { void window[prop]; return; } catch(e){}
+    var store = {};
+    var api = {
+      getItem: function(k){ return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; },
+      setItem: function(k, v){ store[k] = String(v); },
+      removeItem: function(k){ delete store[k]; },
+      clear: function(){ store = {}; },
+      key: function(){ return null; },
+      get length(){ return 0; }
+    };
+    try { Object.defineProperty(window, prop, { value: api, configurable: true }); } catch(e){}
+  }
+  shim('localStorage'); shim('sessionStorage');
+  window.addEventListener('error', function(e){
+    try { parent.postMessage({ type: 'aicoder-preview-error', msg: String((e && (e.message || e.error)) || 'Script-Fehler') }, '*'); } catch(err){}
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    try { parent.postMessage({ type: 'aicoder-preview-error', msg: 'Promise: ' + String(e && e.reason) }, '*'); } catch(err){}
+  });
+})();
+</script>
+`;
 
 // Zusätzliche, sprachunabhängige Ausgabe-Regel – verstärkt die System-Prompt-Regeln,
 // weil kleine Modelle (0.5B) sonst oft Text/Markdown statt Code liefern.
@@ -939,6 +983,7 @@ export default function Home() {
   const [view, setView] = useState<"preview" | "code">("preview");
   const [mobileTab, setMobileTab] = useState<"chat" | "preview">("chat");
   const [copied, setCopied] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [genProgress, setGenProgress] = useState<GenProgress | null>(null);
   const [genStartAt, setGenStartAt] = useState<number | null>(null);
   const [, setTick] = useState(0); // löst Re-Render für den Sekunden-Zähler aus
@@ -1052,6 +1097,18 @@ export default function Home() {
     const t = setInterval(() => setTick((x) => x + 1), 1000);
     return () => clearInterval(t);
   }, [genProgress, genStartAt]);
+
+  // Skriptfehler aus der Vorschau-Iframe anzeigen (meldet das PREVIEW_SHIM per postMessage).
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      const d = e.data as { type?: string; msg?: unknown } | undefined;
+      if (d && d.type === "aicoder-preview-error") {
+        setPreviewError(String(d.msg ?? "").replace(/^Error:\s*/i, "").slice(0, 300));
+      }
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
 
   function updateAssistant(id: string, patch: Partial<ChatMessage>) {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch } : m)));
@@ -1195,6 +1252,7 @@ export default function Home() {
     setMessages((prev) => [...prev, userMsg, assistantMsg]);
     setBusy(true);
     setGenProgress({ pct: 0, etaSec: null, tokens: 0 });
+    setPreviewError(null);
     streamRef.current = { content: "" };
 
     const genStart = performance.now();
@@ -1301,6 +1359,7 @@ export default function Home() {
     setMobileTab("chat");
     setGenProgress(null);
     setGenStartAt(null);
+    setPreviewError(null);
     textareaRef.current?.focus();
   }
 
@@ -1549,13 +1608,24 @@ export default function Home() {
                 <p className="hint">{T.previewHint}</p>
               </div>
             ) : view === "preview" ? (
-              <iframe
-                key={previewHtml.length}
-                title={T.viewPreview}
-                srcDoc={previewHtml}
-                sandbox="allow-scripts allow-modals allow-forms"
-                className="preview-frame"
-              />
+              <>
+                {previewError && (
+                  <div className="preview-error-note">
+                    <span>{T.previewErrorLabel}</span>
+                    <code>{previewError}</code>
+                    <button onClick={() => setPreviewError(null)} title="✕" className="preview-error-close">
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <iframe
+                  key={previewHtml.length}
+                  title={T.viewPreview}
+                  srcDoc={PREVIEW_SHIM + previewHtml}
+                  sandbox="allow-scripts allow-modals allow-forms allow-same-origin"
+                  className="preview-frame"
+                />
+              </>
             ) : (
               <pre className="code-view">{previewHtml}</pre>
             )}

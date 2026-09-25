@@ -476,6 +476,47 @@ form button:disabled {
   background: #fff;
 }
 
+.preview-error-note {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #2a0f14;
+  color: #ffb3ad;
+  border: 1px solid #8b2435;
+  border-radius: 8px;
+  font-size: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.preview-error-note code {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ffd9d4;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.preview-error-close {
+  background: transparent;
+  border: none;
+  color: #ffb3ad;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.preview-error-close:hover {
+  background: rgba(255, 179, 173, 0.15);
+}
+
 .code-view {
   flex: 1;
   margin: 0;
