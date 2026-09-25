@@ -56,6 +56,8 @@ type Texts = {
   modelLoadError: string;
   modelFile: string;
   pendingLoad: string; // Hinweis nach Klick auf Erstellen, solange das Modell lädt
+  prefill: string; // Platzhalter {s}: Sekunden seit Start des ersten Rechenschritts
+  slowStart: string; // Meldung, wenn der erste Schritt zu lange dauert
   prevCodeIntro: string;
   genLabel: string; // Platzhalter {pct}
   etaFmt: string; // Platzhalter {m} (Minuten) und {s} (Sekunden)
@@ -91,6 +93,9 @@ const TEXTS: Record<Lang, Texts> = {
     statusReadyGpu: "Modell bereit · läuft im Browser (GPU)",
     statusIdle: "bereit zu laden",
     pendingLoad: "Das Modell wird geladen – die Generierung startet automatisch, sobald es bereit ist.",
+    prefill: "Vorbereitung … seit {s} Sek",
+    slowStart:
+      "Der erste Rechenschritt dauert ungewöhnlich lange. Bitte Seite neu laden – auf schwachen Geräten hilft die ⚡-GPU-Option.",
     gpuToggleTitle: "GPU nutzen, falls vorhanden (schneller). Ohne GPU läuft alles im CPU-Modus.",
     modelSelectTitle: "Kostenloses Browser-Modell wählen",
     langSelectTitle: "Sprache wählen",
@@ -152,6 +157,9 @@ Regeln:
     statusReadyGpu: "Model ready · running in the browser (GPU)",
     statusIdle: "ready to load",
     pendingLoad: "The model is loading – generation will start automatically once it's ready.",
+    prefill: "Preparing … for {s} s",
+    slowStart:
+      "The first computation step is taking unusually long. Please reload the page – on weaker devices the ⚡ GPU option helps.",
     gpuToggleTitle: "Use GPU if available (faster). Without GPU everything runs in CPU mode.",
     modelSelectTitle: "Choose a free browser model",
     langSelectTitle: "Choose language",
@@ -213,6 +221,9 @@ Rules:
     statusReadyGpu: "Το μοντέλο είναι έτοιμο · τρέχει στο πρόγραμμα περιήγησης (GPU)",
     statusIdle: "έτοιμο προς φόρτωση",
     pendingLoad: "Το μοντέλο φορτώνει – η δημιουργία θα ξεκινήσει αυτόματα μόλις είναι έτοιμο.",
+    prefill: "Προετοιμασία … εδώ και {s} δευτ.",
+    slowStart:
+      "Το πρώτο βήμα υπολογισμού καθυστερεί ασυνήθιστα. Παρακαλώ επαναφορτώστε τη σελίδα – σε αδύναμες συσκευές βοηθά η επιλογή ⚡ GPU.",
     gpuToggleTitle: "Χρησιμοποίησε GPU αν υπάρχει (γρηγορότερο). Χωρίς GPU όλα τρέχουν σε λειτουργία CPU.",
     modelSelectTitle: "Επίλεξε δωρεάν μοντέλο στο πρόγραμμα περιήγησης",
     langSelectTitle: "Επίλεξε γλώσσα",
@@ -274,6 +285,9 @@ Rules:
     statusReadyGpu: "モデル準備完了 · ブラウザで実行中（GPU）",
     statusIdle: "読み込み準備完了",
     pendingLoad: "モデルを読み込み中です – 準備ができ次第、自動的に生成を開始します。",
+    prefill: "準備中 … {s} 秒経過",
+    slowStart:
+      "最初の計算ステップに異常に時間がかかっています。ページを再読み込みしてください – 性能の低い端末では ⚡ GPU オプションが役立ちます。",
     gpuToggleTitle: "利用可能ならGPUを使います（高速）。GPUがない場合はCPUモードで動作します。",
     modelSelectTitle: "無料のブラウザモデルを選択",
     langSelectTitle: "言語を選択",
@@ -334,6 +348,9 @@ Rules:
     statusReadyGpu: "模型就绪 · 正在浏览器中运行（GPU）",
     statusIdle: "准备加载",
     pendingLoad: "模型正在加载 – 就绪后会自动开始生成。",
+    prefill: "正在准备 … 已过去 {s} 秒",
+    slowStart:
+      "第一步计算异常缓慢。请重新加载页面 – 在性能较弱的设备上启用 ⚡ GPU 选项会有帮助。",
     gpuToggleTitle: "如果有 GPU 则使用 GPU（更快）。没有 GPU 时以 CPU 模式运行。",
     modelSelectTitle: "选择免费浏览器模型",
     langSelectTitle: "选择语言",
@@ -394,6 +411,9 @@ Rules:
     statusReadyGpu: "मॉडल तैयार · ब्राउज़र में चल रहा है (GPU)",
     statusIdle: "लोड करने के लिए तैयार",
     pendingLoad: "मॉडल लोड हो रहा है – तैयार होते ही निर्माण स्वतः शुरू हो जाएगा।",
+    prefill: "तैयारी … {s} सेकंड बीत गए",
+    slowStart:
+      "पहला गणना चरण असामान्य रूप से धीमा है। कृपया पेज फिर से लोड करें – कमज़ोर डिवाइस पर ⚡ GPU विकल्प मदद करता है।",
     gpuToggleTitle: "उपलब्ध होने पर GPU का उपयोग करें (तेज़)। GPU न होने पर सब कुछ CPU मोड में चलता है।",
     modelSelectTitle: "मुफ्त ब्राउज़र मॉडल चुनें",
     langSelectTitle: "भाषा चुनें",
@@ -454,6 +474,9 @@ Rules:
     statusReadyGpu: "Modèle prêt · tourne dans le navigateur (GPU)",
     statusIdle: "prêt à charger",
     pendingLoad: "Le modèle se charge – la génération démarrera automatiquement dès qu'il sera prêt.",
+    prefill: "Préparation … depuis {s} s",
+    slowStart:
+      "La première étape de calcul prend anormalement longtemps. Veuillez recharger la page – sur les appareils plus faibles, l'option ⚡ GPU aide.",
     gpuToggleTitle: "Utiliser le GPU si disponible (plus rapide). Sans GPU, tout fonctionne en mode CPU.",
     modelSelectTitle: "Choisir un modèle gratuit dans le navigateur",
     langSelectTitle: "Choisir la langue",
@@ -515,6 +538,9 @@ Règles :
     statusReadyGpu: "Modelo listo · funciona en el navegador (GPU)",
     statusIdle: "listo para cargar",
     pendingLoad: "El modelo se está cargando: la generación comenzará automáticamente cuando esté listo.",
+    prefill: "Preparando … desde hace {s} s",
+    slowStart:
+      "El primer paso de cálculo tarda inusualmente mucho. Recarga la página: en dispositivos débiles ayuda la opción ⚡ GPU.",
     gpuToggleTitle: "Usar GPU si está disponible (más rápido). Sin GPU, todo funciona en modo CPU.",
     modelSelectTitle: "Elegir un modelo gratuito en el navegador",
     langSelectTitle: "Elegir idioma",
@@ -576,6 +602,9 @@ Reglas:
     statusReadyGpu: "Mfano uko tayari · unafanya kazi kwenye kivinjari (GPU)",
     statusIdle: "tayari kupakia",
     pendingLoad: "Mfano unapakia – uundaji utaanza kiotomatiki ukishatayari.",
+    prefill: "Kutayarisha … kwa sekunde {s}",
+    slowStart:
+      "Hatua ya kwanza ya hesabu inachukua muda mrefu mno. Tafadhali pakia upya ukurasa – kwenye vifaa dhaifu chaguo la ⚡ GPU husaidia.",
     gpuToggleTitle: "Tumia GPU ikiwa inapatikana (haraka zaidi). Bila GPU kila kitu kinafanya kazi kwa njia ya CPU.",
     modelSelectTitle: "Chagua mfano wa bure wa kivinjari",
     langSelectTitle: "Chagua lugha",
@@ -637,6 +666,9 @@ Sheria:
     statusReadyGpu: "Modello pronto · gira nel browser (GPU)",
     statusIdle: "pronto per il caricamento",
     pendingLoad: "Il modello si sta caricando: la generazione partirà automaticamente quando sarà pronto.",
+    prefill: "Preparazione … da {s} s",
+    slowStart:
+      "Il primo passaggio di calcolo sta richiedendo molto più tempo del previsto. Ricarica la pagina: sui dispositivi meno potenti aiuta l'opzione ⚡ GPU.",
     gpuToggleTitle: "Usa la GPU se disponibile (più veloce). Senza GPU tutto gira in modalità CPU.",
     modelSelectTitle: "Scegli un modello gratuito nel browser",
     langSelectTitle: "Scegli la lingua",
@@ -698,6 +730,9 @@ Regole:
     statusReadyGpu: "Model hazır · tarayıcıda çalışıyor (GPU)",
     statusIdle: "yüklenmeye hazır",
     pendingLoad: "Model yükleniyor – hazır olduğunda oluşturma otomatik başlayacak.",
+    prefill: "Hazırlanıyor … {s} saniyedir",
+    slowStart:
+      "İlk hesaplama adımı alışılmadık şekilde uzun sürüyor. Lütfen sayfayı yenileyin – zayıf cihazlarda ⚡ GPU seçeneği yardımcı olur.",
     gpuToggleTitle: "Varsa GPU kullan (daha hızlı). GPU yoksa her şey CPU modunda çalışır.",
     modelSelectTitle: "Ücretsiz tarayıcı modeli seç",
     langSelectTitle: "Dil seç",
@@ -870,6 +905,8 @@ export default function Home() {
   const [mobileTab, setMobileTab] = useState<"chat" | "preview">("chat");
   const [copied, setCopied] = useState(false);
   const [genProgress, setGenProgress] = useState<GenProgress | null>(null);
+  const [genStartAt, setGenStartAt] = useState<number | null>(null);
+  const [, setTick] = useState(0); // löst Re-Render für den Sekunden-Zähler aus
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -972,6 +1009,14 @@ export default function Home() {
   useEffect(() => {
     if (loadState === "ready") setRuntimeError(null);
   }, [loadState]);
+
+  // Sekunden-Zähler während der Prefill-Phase (0 Tokens): tickt jede Sekunde,
+  // damit die „Vorbereitung …"-Anzeige mitlaufende Sekunden zeigt.
+  useEffect(() => {
+    if (!genProgress || genProgress.tokens > 0 || genStartAt == null) return;
+    const t = setInterval(() => setTick((x) => x + 1), 1000);
+    return () => clearInterval(t);
+  }, [genProgress, genStartAt]);
 
   function updateAssistant(id: string, patch: Partial<ChatMessage>) {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch } : m)));
@@ -1122,6 +1167,7 @@ export default function Home() {
     streamRef.current = { content: "" };
 
     const genStart = performance.now();
+    setGenStartAt(genStart);
     let tokenCount = 0;
 
     try {
@@ -1166,7 +1212,28 @@ export default function Home() {
       // Kurz dem Browser die Chance geben, den Status zu rendern, bevor die Inferenz startet.
       await new Promise((res) => setTimeout(res, 80));
 
-      await r.gen(chatMessages, { max_new_tokens: MAX_TOKENS, do_sample: false, streamer });
+      // Watchdog: Kommt sehr lange kein erstes Token (Prefill blockiert/steckt fest),
+      // mit einer klaren Meldung abbrechen statt endlos bei 0 % zu hängen.
+      const FIRST_TOKEN_TIMEOUT_MS = 240_000;
+      let firstTokenTimer: ReturnType<typeof setInterval> | null = null;
+      const firstTokenTimeout = new Promise<never>((_, rej) => {
+        firstTokenTimer = setInterval(() => {
+          if (tokenCount > 0) {
+            if (firstTokenTimer) clearInterval(firstTokenTimer);
+            return;
+          }
+          if (performance.now() - genStart > FIRST_TOKEN_TIMEOUT_MS) {
+            if (firstTokenTimer) clearInterval(firstTokenTimer);
+            rej(new Error(T.slowStart));
+          }
+        }, 4000);
+      });
+
+      await Promise.race([
+        r.gen(chatMessages, { max_new_tokens: MAX_TOKENS, do_sample: false, streamer }),
+        firstTokenTimeout,
+      ]);
+      if (firstTokenTimer) clearInterval(firstTokenTimer);
 
       const { html, asCode } = extractHtml(streamRef.current.content);
       const visible = stripCode(streamRef.current.content);
@@ -1188,6 +1255,7 @@ export default function Home() {
     } finally {
       setBusy(false);
       setGenProgress(null);
+      setGenStartAt(null);
     }
   }
 
@@ -1199,6 +1267,7 @@ export default function Home() {
     setView("preview");
     setMobileTab("chat");
     setGenProgress(null);
+    setGenStartAt(null);
     textareaRef.current?.focus();
   }
 
@@ -1259,6 +1328,12 @@ export default function Home() {
       return { label: text, pct: loadPct.pct };
     }
     if (genProgress) {
+      if (genProgress.tokens === 0) {
+        // Prefill: der erste Rechenschritt läuft, noch keine Tokens.
+        // Sekunden-Zähler zeigt: es arbeitet, nichts hängt.
+        const secs = genStartAt != null ? Math.floor((performance.now() - genStartAt) / 1000) : 0;
+        return { label: T.prefill.replace("{s}", String(secs)), pct: 0 };
+      }
       return { label: progressLabel(lang, genProgress), pct: genProgress.pct };
     }
     return null;
