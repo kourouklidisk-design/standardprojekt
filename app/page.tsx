@@ -19,7 +19,7 @@ type GenProgress = { pct: number; etaSec: number | null; tokens: number };
 
 type BrowserModel = { id: string; label: string; size: string };
 
-type Lang = "de" | "en" | "el" | "ja" | "zh" | "hi" | "fr" | "es" | "sw";
+type Lang = "de" | "en" | "el" | "ja" | "zh" | "hi" | "fr" | "es" | "sw" | "it" | "tr";
 
 type Texts = {
   subtitle: string;
@@ -64,16 +64,18 @@ type Texts = {
   system: string;
 };
 
-const LANGS: { code: Lang; native: string }[] = [
-  { code: "de", native: "Deutsch" },
-  { code: "en", native: "English" },
-  { code: "el", native: "Ελληνικά" },
-  { code: "ja", native: "日本語" },
-  { code: "zh", native: "中文" },
-  { code: "hi", native: "हिन्दी" },
-  { code: "fr", native: "Français" },
-  { code: "es", native: "Español" },
-  { code: "sw", native: "Kiswahili" },
+const LANGS: { code: Lang; native: string; flag: string }[] = [
+  { code: "de", native: "Deutsch", flag: "🇩🇪" },
+  { code: "en", native: "English", flag: "🇬🇧" },
+  { code: "fr", native: "Français", flag: "🇫🇷" },
+  { code: "es", native: "Español", flag: "🇪🇸" },
+  { code: "it", native: "Italiano", flag: "🇮🇹" },
+  { code: "tr", native: "Türkçe", flag: "🇹🇷" },
+  { code: "el", native: "Ελληνικά", flag: "🇬🇷" },
+  { code: "ja", native: "日本語", flag: "🇯🇵" },
+  { code: "zh", native: "中文", flag: "🇨🇳" },
+  { code: "hi", native: "हिन्दी", flag: "🇮🇳" },
+  { code: "sw", native: "Kiswahili", flag: "🇹🇿" },
 ];
 
 const TEXTS: Record<Lang, Texts> = {
@@ -613,6 +615,125 @@ Sheria:
 - Kwa michezo: udhibiti laini (kibodi/kugusa), alama na skrini ya mwisho wa mchezo.
 - Kwa tovuti: urambazaji, sehemu nyingi na eneo la mawasiliano.`,
   },
+
+  /* ————————————————— Italiano ————————————————— */
+  it: {
+    subtitle: "Homepage, giochi e web app da un prompt",
+    statusLoadingNoPct: "Caricamento del modello …",
+    statusLoading: "Caricamento del modello … {pct} %",
+    statusLoadingEta: "Caricamento del modello … {pct} % · mancano circa {eta}",
+    statusError: "Impossibile caricare il modello",
+    statusReady: "Modello pronto · gira nel browser",
+    statusReadyGpu: "Modello pronto · gira nel browser (GPU)",
+    statusIdle: "pronto per il caricamento",
+    gpuToggleTitle: "Usa la GPU se disponibile (più veloce). Senza GPU tutto gira in modalità CPU.",
+    modelSelectTitle: "Scegli un modello gratuito nel browser",
+    langSelectTitle: "Scegli la lingua",
+    newChat: "✦ Nuovo",
+    tabChat: "Chat",
+    tabResult: "Risultato",
+    welcomeTitle: "Cosa vuoi creare?",
+    welcomeText:
+      "Descrivi semplicemente ciò di cui hai bisogno – homepage, gioco o piccola web app. L'IA gira interamente su questo dispositivo e ti mostra il codice in tempo reale a destra.",
+    hintFree: "100 % gratuito · gira direttamente nel browser · niente server, niente account, niente chiave API",
+    hintFirstLoad:
+      "Al primo avvio il modello viene scaricato una sola volta ({size}) e poi messo in cache nel browser.",
+    placeholder: 'es. "Crea un gioco Snake con il punteggio"',
+    submit: "Crea ▶",
+    viewPreview: "Anteprima",
+    viewCode: "Codice",
+    openTabTitle: "Apri in una nuova scheda",
+    copyTitle: "Copia il codice",
+    downloadTitle: "Scarica index.html",
+    previewEmpty: "Il tuo risultato appare qui – in tempo reale mentre l'IA scrive il codice.",
+    previewHint: "Gira interamente sul tuo dispositivo – niente server, niente chiave API.",
+    confirmNewChat: "Vuoi davvero eliminare la chat attuale?",
+    donePreview: "✔ Fatto – la tua app è nell'anteprima.",
+    done: "✔ Fatto.",
+    errorPrefix: "Errore: ",
+    modelLoadError: "Impossibile caricare il modello.",
+    modelFile: "modello",
+    prevCodeIntro: "Codice attuale (apportaci delle modifiche):",
+    genLabel: "Generazione … {pct} %",
+    etaFmt: "circa {m} min {s} s",
+    tokensFmt: "{n} token",
+    busyNotes: ["Scrive codice …", "Rifinisce il design …", "Quasi pronto …"],
+    examples: [
+      { icon: "🌐", label: "Landing page", prompt: "Crea una landing page moderna per un caffè italiano con orari di apertura e foto." },
+      { icon: "🐍", label: "Gioco", prompt: "Crea un classico gioco Snake con punteggio, livello e schermata di fine partita." },
+      { icon: "✅", label: "To-do list", prompt: "Crea un'app web di elenco attività con aggiunta, spunta, eliminazione e salvataggio nel browser." },
+      { icon: "🧮", label: "Calcolatrice", prompt: "Crea una bella calcolatrice con controllo da tastiera e cronologia." },
+    ],
+    system: `Sei "AI-Coder", un generatore di singoli file HTML. Crei applicazioni web complete e autonome come UN unico file index.html con CSS e JavaScript incorporati.
+
+Regole:
+- Emetti solo il codice HTML completo, in un unico blocco di codice Markdown che inizia con \`\`\`html e termina con \`\`\`.
+- Nessuna spiegazione fuori dal blocco di codice.
+- Nessun tool di build o server necessario: tutto gira offline in una scheda del browser (HTML/CSS/JS puro).
+- Design moderno e accattivante con variabili CSS, responsive (desktop + mobile).
+- Il codice deve funzionare subito – niente segnaposto, niente commenti TODO.
+- Per i giochi: controlli fluidi (tastiera/touch), punteggio e schermata di fine partita.
+- Per i siti web: navigazione, più sezioni e area contatti.`,
+  },
+
+  /* ————————————————— Türkçe ————————————————— */
+  tr: {
+    subtitle: "Prompt ile ana sayfalar, oyunlar ve web uygulamaları",
+    statusLoadingNoPct: "Model yükleniyor …",
+    statusLoading: "Model yükleniyor … {pct} %",
+    statusLoadingEta: "Model yükleniyor … {pct} % · yaklaşık {eta} kaldı",
+    statusError: "Model yüklenemedi",
+    statusReady: "Model hazır · tarayıcıda çalışıyor",
+    statusReadyGpu: "Model hazır · tarayıcıda çalışıyor (GPU)",
+    statusIdle: "yüklenmeye hazır",
+    gpuToggleTitle: "Varsa GPU kullan (daha hızlı). GPU yoksa her şey CPU modunda çalışır.",
+    modelSelectTitle: "Ücretsiz tarayıcı modeli seç",
+    langSelectTitle: "Dil seç",
+    newChat: "✦ Yeni",
+    tabChat: "Sohbet",
+    tabResult: "Sonuç",
+    welcomeTitle: "Ne oluşturmak istiyorsun?",
+    welcomeText:
+      "İhtiyacın olanı basitçe açıkla – ana sayfa, oyun veya küçük bir web uygulaması. Yapay zekâ tamamen bu cihazda çalışır ve kodu sağda canlı olarak gösterir.",
+    hintFree: "%100 ücretsiz · doğrudan tarayıcıda çalışır · sunucu yok, hesap yok, API anahtarı yok",
+    hintFirstLoad: "İlk açılışta model bir kez indirilir ({size}) ve sonra tarayıcıda önbelleğe alınır.",
+    placeholder: 'ör. "Puan sayaçlı bir yılan oyunu oluştur"',
+    submit: "Oluştur ▶",
+    viewPreview: "Önizleme",
+    viewCode: "Kod",
+    openTabTitle: "Yeni sekmede aç",
+    copyTitle: "Kodu kopyala",
+    downloadTitle: "index.html indir",
+    previewEmpty: "Sonucun burada görünür – yapay zekâ kodu yazarken canlı olarak.",
+    previewHint: "Tamamen cihazında çalışır – sunucu yok, API anahtarı yok.",
+    confirmNewChat: "Mevcut sohbeti gerçekten silmek istiyor musun?",
+    donePreview: "✔ Tamam – uygulaman önizlemede.",
+    done: "✔ Tamam.",
+    errorPrefix: "Hata: ",
+    modelLoadError: "Model yüklenemedi.",
+    modelFile: "model",
+    prevCodeIntro: "Mevcut kod (bunun üzerinde değişiklik yap):",
+    genLabel: "Oluşturuluyor … {pct} %",
+    etaFmt: "yaklaşık {m} dk {s} sn",
+    tokensFmt: "{n} token",
+    busyNotes: ["Kod yazıyor …", "Tasarımı bitiriyor …", "Neredeyse hazır …"],
+    examples: [
+      { icon: "🌐", label: "Açılış sayfası", prompt: "Açılış saatleri ve fotoğraflarla bir İtalyan kafesi için modern bir açılış sayfası oluştur." },
+      { icon: "🐍", label: "Oyun", prompt: "Puan sayacı, seviye göstergesi ve oyun sonu ekranıyla klasik bir yılan oyunu oluştur." },
+      { icon: "✅", label: "Yapılacaklar", prompt: "Tarayıcıda ekleme, işaretleme, silme ve kaydetme özellikli bir yapılacaklar listesi web uygulaması oluştur." },
+      { icon: "🧮", label: "Hesap makinesi", prompt: "Klavye kontrolü ve geçmişi olan şık bir hesap makinesi oluştur." },
+    ],
+    system: `Sen "AI-Coder"sın, tek bir HTML dosyası üreten bir araçsın. CSS ve JavaScript gömülü TEK bir index.html dosyası olarak eksiksiz, kendi kendine yeten web uygulamaları oluşturursun.
+
+Kurallar:
+- Yalnızca tam HTML kodunu, \`\`\`html ile başlayıp \`\`\` ile biten tek bir Markdown kod bloğu içinde çıkar.
+- Kod bloğunun dışında hiçbir açıklama yok.
+- Derleme aracı veya sunucu gerekmez: her şey bir tarayıcı sekmesinde çevrimdışı çalışır (saf HTML/CSS/JS).
+- CSS değişkenleriyle modern, çekici tasarım, duyarlı (masaüstü + mobil).
+- Kod hemen çalışabilir olmalı – yer tutucu yok, TODO yorumu yok.
+- Oyunlar için: akıcı kontrol (klavye/dokunmatik), puan göstergesi ve oyun sonu ekranı.
+- Web siteleri için: gezinme, birden çok bölüm ve iletişim alanı.`,
+  },
 };
 
 const BROWSER_MODELS: BrowserModel[] = [
@@ -689,6 +810,8 @@ function detectLang(): Lang {
       if (b.startsWith("hi")) return "hi";
       if (b.startsWith("fr")) return "fr";
       if (b.startsWith("es")) return "es";
+      if (b.startsWith("it")) return "it";
+      if (b.startsWith("tr")) return "tr";
       if (b.startsWith("sw")) return "sw";
       if (b.startsWith("en")) return "en";
     }
@@ -1062,7 +1185,7 @@ export default function Home() {
           >
             {LANGS.map((l) => (
               <option key={l.code} value={l.code}>
-                {l.native}
+                {l.flag} {l.native}
               </option>
             ))}
           </select>
