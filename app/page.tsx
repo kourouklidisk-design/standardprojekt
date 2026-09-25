@@ -881,8 +881,7 @@ function formatEta(lang: Lang, seconds: number): string {
 function progressLabel(lang: Lang, p: GenProgress): string {
   const label = TEXTS[lang].genLabel.replace("{pct}", String(p.pct));
   const eta = p.etaSec == null ? "" : ` · ${formatEta(lang, p.etaSec)}`;
-  const tok = ` · ${TEXTS[lang].tokensFmt.replace("{n}", String(p.tokens))}`;
-  return label + eta + tok;
+  return label + eta;
 }
 
 /* ————— Komponente ————— */
