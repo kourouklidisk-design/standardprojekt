@@ -54,6 +54,8 @@ type Texts = {
   previewDiagLabel: string; // Vorspann der Diagnose-Meldung (fehlende Element-IDs)
   previewDiagIds: string; // Platzhalter {ids} – fehlende Element-IDs
   diagFixIntro: string; // Platzhalter {ids} – Einleitung des Fix-Prompts bei fehlenden Element-IDs
+  genFailHint: string; // Hinweis nach einem Generierungs-Crash (Sitzung wird frisch aufgebaut)
+  gpuFailHint: string; // Tipp: GPU-Option deaktivieren
   previewHint: string;
   confirmNewChat: string;
   donePreview: string;
@@ -127,6 +129,9 @@ const TEXTS: Record<Lang, Texts> = {
     fixPromptIntro:
       "Der letzte generierte Code verursacht in der Vorschau diesen Fehler – korrigiere ihn und gib die komplette, lauffähige HTML-Datei zurück. Fehler:",
     fixButton: "🔧 Fehler beheben",
+    genFailHint:
+      "Die fehlgeschlagene Modell-Sitzung wurde verworfen – der nächste Versuch baut sie frisch auf und läuft meist wieder. Einfach noch einmal senden oder „Fehler beheben“ klicken.",
+    gpuFailHint: "Tipp: Deaktiviere oben die GPU-Option und versuche es erneut (WASM ist stabiler).",
     previewDiagLabel: "⚠ Vorschau-Diagnose: ",
     previewDiagIds:
       "Diese Element-ID wird im JavaScript verwendet, existiert aber nicht im HTML: {ids}. Klicke „Fehler beheben“, damit das Modell das fehlende Element ergänzt.",
@@ -202,6 +207,9 @@ Regeln:
     fixPromptIntro:
       "The last generated code causes this error in the preview – fix it and return the complete, working HTML file. Error:",
     fixButton: "🔧 Fix error",
+    genFailHint:
+      "The failed model session was discarded – the next attempt rebuilds it fresh and usually works. Simply send again or click “Fix error”.",
+    gpuFailHint: "Tip: disable the GPU option above and try again (WASM is more stable).",
     previewDiagLabel: "⚠ Preview diagnostic: ",
     previewDiagIds:
       "This element ID is used by the JavaScript but is missing from the HTML: {ids}. Click “Fix error” so the model adds the missing element.",
@@ -277,6 +285,9 @@ Rules:
     fixPromptIntro:
       "Ο τελευταίος κώδικας που δημιουργήθηκε προκαλεί αυτό το σφάλμα στην προεπισκόπηση – διόρθωσέ το και επέστρεψε το πλήρες, λειτουργικό αρχείο HTML. Σφάλμα:",
     fixButton: "🔧 Διόρθωση σφάλματος",
+    genFailHint:
+      "Η αποτυχημένη συνεδρία του μοντέλου απορρίφθηκε – η επόμενη προσπάθεια τη δημιουργεί από την αρχή και συνήθως λειτουργεί. Απλώς στείλε ξανά ή κάνε κλικ στο „Διόρθωση σφάλματος“.",
+    gpuFailHint: "Συμβουλή: Απενεργοποίησε την επιλογή GPU και δοκίμασε ξανά (το WASM είναι πιο σταθερό).",
     previewDiagLabel: "⚠ Διάγνωση προεπισκόπησης: ",
     previewDiagIds:
       "Αυτό το αναγνωριστικό στοιχείου χρησιμοποιείται από την JavaScript αλλά λείπει από το HTML: {ids}. Κάνε κλικ στο „Διόρθωση σφάλματος“ για να προσθέσει το μοντέλο το στοιχείο που λείπει.",
@@ -351,6 +362,9 @@ Rules:
     fixPromptIntro:
       "最後に生成されたコードがプレビューでこのエラーを引き起こしています – 修正して、完全に動作する HTML ファイルを返してください。エラー:",
     fixButton: "🔧 エラーを修正",
+    genFailHint:
+      "失敗したモデルセッションは破棄されました – 次の試行で新しく構築され、通常は再び動作します。もう一度送信するか、「エラーを修正」をクリックしてください。",
+    gpuFailHint: "ヒント: 上記の GPU オプションを無効にして再試行してください（WASM の方が安定しています）。",
     previewDiagLabel: "⚠ プレビュー診断: ",
     previewDiagIds:
       "この要素 ID は JavaScript で使われていますが、HTML に存在しません: {ids}。「エラーを修正」をクリックすると、モデルが不足している要素を追加します。",
@@ -425,6 +439,9 @@ Rules:
     fixPromptIntro:
       "最后生成的代码在预览中引发了此错误 – 请修复它并返回完整的、可正常运行的 HTML 文件。错误：",
     fixButton: "🔧 修复错误",
+    genFailHint:
+      "失败的模型会话已被丢弃 – 下次尝试会重新构建，通常即可正常运行。请再次发送或点击“修复错误”。",
+    gpuFailHint: "提示：请停用上方的 GPU 选项后重试（WASM 更稳定）。",
     previewDiagLabel: "⚠ 预览诊断：",
     previewDiagIds:
       "此元素 ID 在 JavaScript 中使用，但 HTML 中不存在：{ids}。点击“修复错误”，模型会补充缺失的元素。",
@@ -499,6 +516,9 @@ Rules:
     fixPromptIntro:
       "पिछले जनरेट किए गए कोड से पूर्वावलोकन में यह त्रुटि हो रही है – इसे ठीक करें और पूरी, काम करने वाली HTML फ़ाइल लौटाएं। त्रुटि:",
     fixButton: "🔧 त्रुटि ठीक करें",
+    genFailHint:
+      "विफल मॉडल सत्र को हटा दिया गया है – अगला प्रयास इसे नए सिरे से बनाता है और आमतौर पर काम करता है। बस फिर से भेजें या „त्रुटि ठीक करें“ पर क्लिक करें।",
+    gpuFailHint: "सुझाव: ऊपर GPU विकल्प बंद करके दोबारा प्रयास करें (WASM अधिक स्थिर है)।",
     previewDiagLabel: "⚠ पूर्वावलोकन निदान: ",
     previewDiagIds:
       "यह एलिमेंट ID JavaScript में उपयोग होती है, लेकिन HTML में मौजूद नहीं है: {ids}। „त्रुटि ठीक करें“ पर क्लिक करें ताकि मॉडल लापता एलिमेंट जोड़ दे।",
@@ -574,6 +594,9 @@ Rules:
     fixPromptIntro:
       "Le dernier code généré provoque cette erreur dans l'aperçu – corrige-la et renvoie le fichier HTML complet et fonctionnel. Erreur :",
     fixButton: "🔧 Corriger l'erreur",
+    genFailHint:
+      "La session de modèle ayant échoué a été supprimée – la prochaine tentative la reconstruit et fonctionne généralement. Il suffit de renvoyer ou de cliquer sur « Corriger l'erreur ».",
+    gpuFailHint: "Astuce : désactivez l'option GPU ci-dessus et réessayez (WASM est plus stable).",
     previewDiagLabel: "⚠ Diagnostic de l'aperçu : ",
     previewDiagIds:
       "Cet ID d'élément est utilisé par le JavaScript mais est absent du HTML : {ids}. Cliquez sur « Corriger l'erreur » pour que le modèle ajoute l'élément manquant.",
@@ -649,6 +672,9 @@ Règles :
     fixPromptIntro:
       "El último código generado provoca este error en la vista previa: corrígelo y devuelve el archivo HTML completo y funcional. Error:",
     fixButton: "🔧 Corregir error",
+    genFailHint:
+      "La sesión de modelo fallida se ha descartado: el siguiente intento la reconstruye desde cero y suele funcionar. Simplemente envía de nuevo o haz clic en « Corregir error ».",
+    gpuFailHint: "Consejo: desactiva la opción de GPU de arriba y vuelve a intentarlo (WASM es más estable).",
     previewDiagLabel: "⚠ Diagnóstico de la vista previa: ",
     previewDiagIds:
       "Este ID de elemento lo usa el JavaScript, pero no existe en el HTML: {ids}. Haz clic en « Corregir error » para que el modelo añada el elemento que falta.",
@@ -724,6 +750,9 @@ Reglas:
     fixPromptIntro:
       "Msimbo wa mwisho uliozalishwa unasababisha hitilafu hii katika onyesho – lisahihishe na urudishe faili kamili la HTML linalofanya kazi. Hitilafu:",
     fixButton: "🔧 Sahihisha hitilafu",
+    genFailHint:
+      "Kika cha mfano kilichoshindwa kimetupwa – jaribio linalofuata linajenga upya na kwa kawaida hufanya kazi. Tuma tena au bofya „Sahihisha hitilafu“.",
+    gpuFailHint: "Kidokezo: zima chaguo la GPU hapo juu na ujaribu tena (WASM ni thabiti zaidi).",
     previewDiagLabel: "⚠ Utambuzi wa onyesho: ",
     previewDiagIds:
       "Kitambulisho hiki cha kipengele kinatumiwa na JavaScript lakini hakipo kwenye HTML: {ids}. Bofya „Sahihisha hitilafu“ ili muundo uongeze kipengele kinachokosekana.",
@@ -799,6 +828,9 @@ Sheria:
     fixPromptIntro:
       "L'ultimo codice generato causa questo errore nell'anteprima – correggilo e restituisci il file HTML completo e funzionante. Errore:",
     fixButton: "🔧 Correggi errore",
+    genFailHint:
+      "La sessione del modello non riuscita è stata scartata: il prossimo tentativo la ricostruisce da zero e di solito funziona. Basta inviare di nuovo o cliccare su « Correggi errore ».",
+    gpuFailHint: "Suggerimento: disattiva l'opzione GPU qui sopra e riprova (WASM è più stabile).",
     previewDiagLabel: "⚠ Diagnosi dell'anteprima: ",
     previewDiagIds:
       "Questo ID di elemento è usato dal JavaScript ma non esiste nell'HTML: {ids}. Clicca su « Correggi errore » per far aggiungere al modello l'elemento mancante.",
@@ -873,6 +905,9 @@ Regole:
     fixPromptIntro:
       "Son oluşturulan kod önizlemede şu hataya neden oluyor – hatayı düzelt ve eksiksiz, çalışan HTML dosyasını geri döndür. Hata:",
     fixButton: "🔧 Hatayı düzelt",
+    genFailHint:
+      "Başarısız model oturumu atıldı – bir sonraki deneme onu sıfırdan oluşturur ve genellikle çalışır. Tekrar gönderin veya „Hatayı düzelt“e tıklayın.",
+    gpuFailHint: "İpucu: Yukarıdaki GPU seçeneğini kapatıp tekrar deneyin (WASM daha stabildir).",
     previewDiagLabel: "⚠ Önizleme teşhisi: ",
     previewDiagIds:
       "Bu öğe Kimliği JavaScript tarafından kullanılıyor ancak HTML'de yok: {ids}. Modelin eksik öğeyi eklemesi için „Hatayı düzelt“e tıklayın.",
@@ -1378,7 +1413,12 @@ export default function Home() {
       }
     })();
 
-    prom.catch(() => onStatus({ state: "error", pct: null, device: "", eta: null }));
+    prom.catch(() => {
+      onStatus({ state: "error", pct: null, device: "", eta: null });
+      // Fehlgeschlagene Pipeline NICHT im Cache behalten – sonst scheitert auch
+      // jeder spätere Versuch an demselben kaputten Promise.
+      pipelinesRef.current.delete(cacheKey);
+    });
     pipelinesRef.current.set(cacheKey, prom);
     return prom;
   }
@@ -1501,9 +1541,27 @@ export default function Home() {
       });
       setMobileTab("preview");
     } catch (err) {
+      // Generierungs-Crash (z. B. „Cannot read properties of undefined (reading
+      // 'destroy')" aus den transformers.js-/onnxruntime-Interna): die (vermutlich
+      // kaputte) Modell-Sitzung verwerfen, sonst reproduziert jeder weitere Versuch
+      // – auch über „Fehler beheben" – denselben Fehler.
+      pipelinesRef.current.delete(`${modelID}|${useGpu ? "gpu" : "cpu"}`);
+      const emg = err instanceof Error ? err.message : String(err);
+      let hint = T.genFailHint;
+      if (useGpu) hint += ` ${T.gpuFailHint}`;
+      const stackLine =
+        err instanceof Error && err.stack
+          ? err.stack
+              .split("\n")
+              .slice(1)
+              .map((l) => l.trim())
+              .filter((l) => l.startsWith("at "))
+              .slice(0, 2)
+              .join(" ")
+          : "";
       updateAssistant(assistantMsg.id, {
         streaming: false,
-        content: `${T.errorPrefix}${err instanceof Error ? err.message : String(err)}`,
+        content: `${T.errorPrefix}${emg}\n${hint}${stackLine ? `\n${stackLine}` : ""}`,
         error: true,
       });
     } finally {
