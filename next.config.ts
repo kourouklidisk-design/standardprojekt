@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
           { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
         ],
       },
+      {
+        // Dokument nie cachen: verhindert, dass eine alte App-Version „kleben bleibt",
+        // bis der Browser neu lädt (Ursache: „Klick auf Erstellen reagiert nicht").
+        source: "/",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
     ];
   },
 };
