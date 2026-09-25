@@ -1151,6 +1151,20 @@ export default function Home() {
     return { text: T.statusIdle, cls: "" };
   }
 
+  // Einheitliche Fortschrittsanzeige (Modell laden ODER App generieren)
+  const progressInfo = (() => {
+    if (genProgress) {
+      return { label: progressLabel(lang, genProgress), pct: genProgress.pct };
+    }
+    if (loadState === "loading" && loadPct) {
+      const tpl = loadEta != null ? T.statusLoadingEta : T.statusLoading;
+      let text = tpl.replace("{pct}", String(loadPct.pct));
+      if (loadEta != null) text = text.replace("{eta}", formatEta(lang, loadEta));
+      return { label: text, pct: loadPct.pct };
+    }
+    return null;
+  })();
+
   const size = BROWSER_MODELS.find((m) => m.id === modelID)?.size ?? "≈ 1 GB";
 
   return (
@@ -1267,11 +1281,11 @@ export default function Home() {
             <div ref={bottomRef} />
           </div>
 
-          {genProgress && (
+          {progressInfo && (
             <div className="gen-progress" role="status" aria-live="polite">
-              <div className="gen-progress-text">{progressLabel(lang, genProgress)}</div>
+              <div className="gen-progress-text">{progressInfo.label}</div>
               <div className="gen-progress-bar">
-                <span style={{ width: `${genProgress.pct}%` }} />
+                <span style={{ width: `${progressInfo.pct}%` }} />
               </div>
             </div>
           )}
@@ -1336,11 +1350,11 @@ export default function Home() {
               <pre className="code-view">{previewHtml}</pre>
             )}
 
-            {genProgress && (
+            {progressInfo && (
               <div className="gen-progress preview-progress" role="status" aria-live="polite">
-                <div className="gen-progress-text">{progressLabel(lang, genProgress)}</div>
+                <div className="gen-progress-text">{progressInfo.label}</div>
                 <div className="gen-progress-bar">
-                  <span style={{ width: `${genProgress.pct}%` }} />
+                  <span style={{ width: `${progressInfo.pct}%` }} />
                 </div>
               </div>
             )}
