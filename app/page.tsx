@@ -57,6 +57,7 @@ type Texts = {
   genFailHint: string; // Hinweis nach einem Generierungs-Crash (Sitzung wird frisch aufgebaut)
   gpuFailHint: string; // Tipp: GPU-Option deaktivieren
   wasmRetryFailHint: string; // Hinweis: auch der automatische CPU-Zweiteversuch scheiterte → Reload nötig
+  autoRestartNote: string; // Chat-Hinweis: automatischer Neustart nach GPU-Doppelt-Crash
   gpuFallbackNote: string; // Chat-Hinweis beim automatischen WASM-Fallback nach GPU-Crash
   emptyDiagNote: string; // Hinweistext: erzeugte Seite ist leer (weiße Vorschau)
   emptyDiagFix: string; // Fix-Prompt bei leerer Seite
@@ -137,6 +138,8 @@ const TEXTS: Record<Lang, Texts> = {
       "Die fehlgeschlagene Modell-Sitzung wurde verworfen – der nächste Versuch baut sie frisch auf und läuft meist wieder. Einfach noch einmal senden oder „Fehler beheben“ klicken.",
     gpuFailHint: "Tipp: Deaktiviere oben die GPU-Option und versuche es erneut (WASM ist stabiler).",
     wasmRetryFailHint: "Auch der automatische zweite Versuch (WASM/CPU) ist fehlgeschlagen. Lade die Seite jetzt komplett neu (Strg+F5) und halte ⚡GPU aus – danach läuft es stabil.",
+    autoRestartNote:
+      "⚡ GPU-Laufzeit abgestürzt – die Seite startet automatisch neu und die Aufgabe wird mit stabilem WASM (CPU) fortgesetzt …",
     gpuFallbackNote: "⚠ GPU-Fehler während der Generierung – versuche automatisch mit WASM (CPU) neu …",
     emptyDiagNote:
       "Die Seite ist leer (kein sichtbarer Text, kein Eingabefeld, keine Buttons). Klicke „Fehler beheben“, damit das Modell die App sichtbar aufbaut.",
@@ -221,6 +224,8 @@ Regeln:
       "The failed model session was discarded – the next attempt rebuilds it fresh and usually works. Simply send again or click “Fix error”.",
     gpuFailHint: "Tip: disable the GPU option above and try again (WASM is more stable).",
     wasmRetryFailHint: "The automatic second attempt (WASM/CPU) failed too. Now hard-reload the page (Ctrl+F5) and keep ⚡ GPU off – it will run stably then.",
+    autoRestartNote:
+      "⚡ GPU runtime crashed – the page is restarting automatically and the task will continue with stable WASM (CPU) …",
     gpuFallbackNote: "⚠ GPU error during generation – automatically retrying with WASM (CPU) …",
     emptyDiagNote:
       "The page is empty (no visible text, no input field, no buttons). Click “Fix error” so the model builds a visible app.",
@@ -305,6 +310,8 @@ Rules:
       "Η αποτυχημένη συνεδρία του μοντέλου απορρίφθηκε – η επόμενη προσπάθεια τη δημιουργεί από την αρχή και συνήθως λειτουργεί. Απλώς στείλε ξανά ή κάνε κλικ στο „Διόρθωση σφάλματος“.",
     gpuFailHint: "Συμβουλή: Απενεργοποίησε την επιλογή GPU και δοκίμασε ξανά (το WASM είναι πιο σταθερό).",
     wasmRetryFailHint: "Η δεύτερη αυτόματη προσπάθεια (WASM/CPU) απέτυχε επίσης. Τώρα κάνε εντελή επαναφόρτωση της σελίδας (Ctrl+F5) και κράτα το ⚡GPU ανενεργό – θα δουλεύει σταθερά.",
+    autoRestartNote:
+      "Έκπτωση runtime GPU – η σελίδα επανεκκινείται αυτόματα και η εργασία συνεχίζεται με σταθερό WASM (CPU) …",
     gpuFallbackNote: "⚠ Σφάλμα GPU κατά τη δημιουργία – γίνεται αυτόματη επανάληψη με WASM (CPU) …",
     emptyDiagNote:
       "Η σελίδα είναι κενή (κανένα ορατό κείμενο, κανένα πεδίο εισαγωγής, κανένα κουμπί). Κάνε κλικ στο „Διόρθωση σφάλματος“ για να φτιάξει το μοντέλο μια εμφανή εφαρμογή.",
@@ -388,6 +395,8 @@ Rules:
       "失敗したモデルセッションは破棄されました – 次の試行で新しく構築され、通常は再び動作します。もう一度送信するか、「エラーを修正」をクリックしてください。",
     gpuFailHint: "ヒント: 上記の GPU オプションを無効にして再試行してください（WASM の方が安定しています）。",
     wasmRetryFailHint: "自動の2回目の試行（WASM/CPU）も失敗しました。今すぐページを完全に再読み込みし（Ctrl+F5）、⚡GPU をオフのままにしてください。そうすれば安定して動作します。",
+    autoRestartNote:
+      "⚡ GPU ランタイムがクラッシュ – ページを自動的に再起動し、安定した WASM（CPU）でタスクを続行します…",
     gpuFallbackNote: "⚠ 生成中に GPU エラーが発生しました – WASM（CPU）で自動的に再試行しています…",
     emptyDiagNote:
       "ページが空です（表示されるテキスト、入力フィールド、ボタンがありません）。「エラーを修正」をクリックすると、モデルが目に見えるアプリを作成します。",
@@ -471,6 +480,7 @@ Rules:
       "失败的模型会话已被丢弃 – 下次尝试会重新构建，通常即可正常运行。请再次发送或点击“修复错误”。",
     gpuFailHint: "提示：请停用上方的 GPU 选项后重试（WASM 更稳定）。",
     wasmRetryFailHint: "自动第二次尝试（WASM/CPU）也失败了。现在请完全重新加载页面（Ctrl+F5）并保持 ⚡GPU 关闭，之后即可稳定运行。",
+    autoRestartNote: "⚡ GPU 运行时崩溃 – 页面正在自动重启，任务将用稳定的 WASM（CPU）继续…",
     gpuFallbackNote: "⚠ 生成期间出现 GPU 错误 – 正在自动改用 WASM（CPU）重试…",
     emptyDiagNote:
       "页面为空（没有可见文本、输入框或按钮）。点击“修复错误”，模型将构建一个可见的应用。",
@@ -554,6 +564,8 @@ Rules:
       "विफल मॉडल सत्र को हटा दिया गया है – अगला प्रयास इसे नए सिरे से बनाता है और आमतौर पर काम करता है। बस फिर से भेजें या „त्रुटि ठीक करें“ पर क्लिक करें।",
     gpuFailHint: "सुझाव: ऊपर GPU विकल्प बंद करके दोबारा प्रयास करें (WASM अधिक स्थिर है)।",
     wasmRetryFailHint: "स्वचालित दूसरा प्रयास (WASM/CPU) भी विफल रहा। अब पेज को पूरी तरह फिर से लोड करें (Ctrl+F5) और ⚡GPU बंद रखें – फिर यह स्थिर रूप से चलेगा।",
+    autoRestartNote:
+      "⚡ GPU रनटाइम क्रैश – पेज स्वचालित रूप से पुनः प्रारंभ हो रहा है और कार्य स्थिर WASM (CPU) से जारी रहेगा…",
     gpuFallbackNote: "⚠ जनरेशन के दौरान GPU त्रुटि – WASM (CPU) के साथ स्वचालित रूप से पुनः प्रयास किया जा रहा है…",
     emptyDiagNote:
       "पेज खाली है (कोई दृश्यमान टेक्स्ट, कोई इनपुट फ़ील्ड, कोई बटन नहीं)। „त्रुटि ठीक करें“ पर क्लिक करें ताकि मॉडल एक दृश्यमान ऐप बनाए।",
@@ -638,6 +650,8 @@ Rules:
       "La session de modèle ayant échoué a été supprimée – la prochaine tentative la reconstruit et fonctionne généralement. Il suffit de renvoyer ou de cliquer sur « Corriger l'erreur ».",
     gpuFailHint: "Astuce : désactivez l'option GPU ci-dessus et réessayez (WASM est plus stable).",
     wasmRetryFailHint: "La deuxième tentative automatique (WASM/CPU) a également échoué. Rechargez maintenant complètement la page (Ctrl+F5) et gardez ⚡GPU désactivé – elle fonctionnera alors de façon stable.",
+    autoRestartNote:
+      "⚡ Environnement GPU planté – la page redémarre automatiquement et la tâche se poursuit avec WASM (CPU) stable …",
     gpuFallbackNote: "⚠ Erreur GPU pendant la génération – nouvelle tentative automatique avec WASM (CPU) …",
     emptyDiagNote:
       "La page est vide (aucun texte visible, aucun champ de saisie, aucun bouton). Cliquez sur « Corriger l'erreur » pour que le modèle crée une application visible.",
@@ -722,6 +736,8 @@ Règles :
       "La sesión de modelo fallida se ha descartado: el siguiente intento la reconstruye desde cero y suele funcionar. Simplemente envía de nuevo o haz clic en « Corregir error ».",
     gpuFailHint: "Consejo: desactiva la opción de GPU de arriba y vuelve a intentarlo (WASM es más estable).",
     wasmRetryFailHint: "El segundo intento automático (WASM/CPU) también falló. Ahora recarga por completo la página (Ctrl+F5) y mantén ⚡GPU desactivado – así funcionará de forma estable.",
+    autoRestartNote:
+      "⚡ Entorno GPU fallado – la página se reinicia automáticamente y la tarea continúa con WASM (CPU) estable …",
     gpuFallbackNote: "⚠ Error de GPU durante la generación: reintentando automáticamente con WASM (CPU) …",
     emptyDiagNote:
       "La página está vacía (sin texto visible, sin campo de entrada, sin botones). Haz clic en « Corregir error » para que el modelo construya una aplicación visible.",
@@ -806,6 +822,8 @@ Reglas:
       "Kika cha mfano kilichoshindwa kimetupwa – jaribio linalofuata linajenga upya na kwa kawaida hufanya kazi. Tuma tena au bofya „Sahihisha hitilafu“.",
     gpuFailHint: "Kidokezo: zima chaguo la GPU hapo juu na ujaribu tena (WASM ni thabiti zaidi).",
     wasmRetryFailHint: "Majaribio ya pili ya kiotomatiki (WASM/CPU) pameshindwa pia. Sasa pakia upya ukurasa kikamilifu (Ctrl+F5) na uweke ⚡GPU zima – kisha itafanya kazi kwa utulivu.",
+    autoRestartNote:
+      "⚡ Mfumo wa GPU umeharibika – ukurasa unaanzishwa upya kiotomatiki na kazi inaendelea kwa WASM (CPU) thabiti …",
     gpuFallbackNote: "⚠ Hitilafu ya GPU wakati wa utengenezaji – inajaribu tena kiotomatiki kwa WASM (CPU) …",
     emptyDiagNote:
       "Ukurasa ni tupu (hakuna maandishi yanayoonekana, hakuna sehemu ya kuingiza, hakuna vitufe). Bofya „Sahihisha hitilafu“ ili muundo uunde programu inayoonekana.",
@@ -890,6 +908,8 @@ Sheria:
       "La sessione del modello non riuscita è stata scartata: il prossimo tentativo la ricostruisce da zero e di solito funziona. Basta inviare di nuovo o cliccare su « Correggi errore ».",
     gpuFailHint: "Suggerimento: disattiva l'opzione GPU qui sopra e riprova (WASM è più stabile).",
     wasmRetryFailHint: "Anche il secondo tentativo automatico (WASM/CPU) è fallito. Ora ricarica completamente la pagina (Ctrl+F5) e tieni ⚡GPU spento – così funzionerà in modo stabile.",
+    autoRestartNote:
+      "⚡ Runtime GPU crashato – la pagina si riavvia automaticamente e l'attività prosegue con WASM (CPU) stabile …",
     gpuFallbackNote: "⚠ Errore GPU durante la generazione – riprovo automaticamente con WASM (CPU) …",
     emptyDiagNote:
       "La pagina è vuota (nessun testo visibile, nessun campo di inserimento, nessun pulsante). Clicca su « Correggi errore » per far creare al modello un'applicazione visibile.",
@@ -973,6 +993,8 @@ Regole:
       "Başarısız model oturumu atıldı – bir sonraki deneme onu sıfırdan oluşturur ve genellikle çalışır. Tekrar gönderin veya „Hatayı düzelt“e tıklayın.",
     gpuFailHint: "İpucu: Yukarıdaki GPU seçeneğini kapatıp tekrar deneyin (WASM daha stabildir).",
     wasmRetryFailHint: "Otomatik ikinci deneme de (WASM/CPU) başarısız oldu. Şimdi sayfayı tamamen yeniden yükleyin (Ctrl+F5) ve ⚡GPU'yu kapalı tutun – sonra kararlı çalışır.",
+    autoRestartNote:
+      "⚡ GPU çalışma zamanı çöktü – sayfa otomatik yeniden başlatılıyor ve görev kararlı WASM (CPU) ile sürüyor …",
     gpuFallbackNote: "⚠ Oluşturma sırasında GPU hatası – WASM (CPU) ile otomatik yeniden deneniyor…",
     emptyDiagNote:
       "Sayfa boş (görünür metin, giriş alanı veya düğme yok). Modelin görünür bir uygulama oluşturması için „Hatayı düzelt“e tıklayın.",
@@ -1022,6 +1044,9 @@ const BROWSER_MODELS: BrowserModel[] = [
 ];
 const DEFAULT_MODEL = BROWSER_MODELS[0].id;
 const STORAGE_KEY = "ai-coder.v2";
+// sessionStorage der Hauptseite (nicht des iframe-Shims): hält den Prompt für die
+// automatische Wiederaufnahme nach dem GPU-Selbstheilungs-Neustart.
+const AUTORETRY_KEY = "ai-coder.autoretry";
 const MAX_TOKENS = 2048;
 
 // Prolog für die Vorschau-Iframe. Zwei Aufgaben:
@@ -1225,6 +1250,7 @@ export default function Home() {
   const [busyNote, setBusyNote] = useState("");
   const [modelID, setModelID] = useState(DEFAULT_MODEL);
   const [useGpu, setUseGpu] = useState(false);
+  const [autoRetry, setAutoRetry] = useState<string | null>(null); // Prompt nach Auto-Neustart
   const [lang, setLang] = useState<Lang>("en");
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [loadPct, setLoadPct] = useState<{ label: string; pct: number } | null>(null);
@@ -1278,6 +1304,42 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-Neustart-Wiederaufnahme: Nach einem GPU-Doppelt-Crash hat der vorherige
+  // Lauf den Prompt hier hinterlegt (seitenspezifisch → überlebt genau EINEN
+  // Reload, danach sofort löschen → kein Reload-Loop). Hier NACH dem Verlauf-
+  // Restore deklariert: die History-Effekte laufen zuerst, das Batch-Update
+  // liefert den frischen Chat, der Auto-Send im Folge-Commit sieht ihn.
+  useEffect(() => {
+    let raw: string | null = null;
+    try {
+      raw = sessionStorage.getItem(AUTORETRY_KEY);
+    } catch {
+      return; // sessionStorage gesperrt (z. B. Privatmodus) – keine Wiederaufnahme
+    }
+    if (!raw) return;
+    sessionStorage.removeItem(AUTORETRY_KEY); // sofort: nur einmal konsumieren
+    try {
+      const { prompt } = JSON.parse(raw) as { prompt?: unknown };
+      if (typeof prompt !== "string" || !prompt.trim()) return;
+      setUseGpu(false); // frischer Lauf zwingend auf CPU – der GPU-Absturz war die Ursache
+      setAutoRetry(prompt.trim());
+    } catch {
+      // defektes Payload – ignorieren
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Wiederhergestellten Prompt automatisch erneut senden. Läuft erst im Commit
+  // NACH History-Restore (autoRetry kam per Batch-Update), d. h. handleSend
+  // sieht den vollständigen Chat inkl. bisherigem Code als Kontext.
+  useEffect(() => {
+    if (!autoRetry) return;
+    const p = autoRetry;
+    setAutoRetry(null);
+    void handleSend(undefined, p);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRetry]);
 
   // Modell laden (vorab + bei Modell-/GPU-Wechsel)
   useEffect(() => {
@@ -1673,6 +1735,27 @@ export default function Home() {
           return;
         } catch (err2) {
           err = err2;
+          // Auch der CPU-Versuch scheiterte am selben destroy-Crash: In ORT-web
+          // ist der Proxy-Worker ein globaler Singleton (Ce), dessen initWasm-
+          // Flag ($r) einen Neuaufbau für die Seitenlebensdauer verhindert – nach
+          // dem GPU-Absturz bleibt er dauerhaft korrupt, ein Wechseln des proxy-
+          // Flags hilft ebenfalls nicht (beide Übergänge brechen an $r/!Ce).
+          // Einzige echte Erholung: frische Seite. Prompt in sessionStorage
+          // hinterlegen, kurze Notiz zeigen, automatisch neu laden – der nächste
+          // Lauf startet zwingend auf CPU (kein Loop möglich: dort greift diese
+          // Bedingung nicht mehr, weil useGpu=false erzwungen wird).
+          let resumed = false;
+          try {
+            sessionStorage.setItem(AUTORETRY_KEY, JSON.stringify({ prompt, ts: Date.now() }));
+            resumed = true;
+          } catch {
+            // sessionStorage gesperrt → unten die normale Fehlermeldung mit Reload-Hinweis
+          }
+          if (resumed) {
+            updateAssistant(assistantMsg.id, { streaming: false, content: T.autoRestartNote });
+            setTimeout(() => location.reload(), 2500);
+            return;
+          }
         }
       }
       const emg = err instanceof Error ? err.message : String(err);
@@ -1723,6 +1806,11 @@ export default function Home() {
 
   function newChat() {
     if (messages.length > 0 && !window.confirm(T.confirmNewChat)) return;
+    try {
+      sessionStorage.removeItem(AUTORETRY_KEY); // ausstehende Auto-Wiederaufnahme verwerfen
+    } catch {
+      // sessionStorage gesperrt – egal
+    }
     setMessages([]);
     setPreviewHtml("");
     setPreviewError(null);
