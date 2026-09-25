@@ -19,7 +19,7 @@ type GenProgress = { pct: number; etaSec: number | null; tokens: number };
 
 type BrowserModel = { id: string; label: string; size: string };
 
-type Lang = "de" | "en" | "el" | "ja" | "zh" | "hi";
+type Lang = "de" | "en" | "el" | "ja" | "zh" | "hi" | "fr" | "es" | "sw";
 
 type Texts = {
   subtitle: string;
@@ -71,6 +71,9 @@ const LANGS: { code: Lang; native: string }[] = [
   { code: "ja", native: "日本語" },
   { code: "zh", native: "中文" },
   { code: "hi", native: "हिन्दी" },
+  { code: "fr", native: "Français" },
+  { code: "es", native: "Español" },
+  { code: "sw", native: "Kiswahili" },
 ];
 
 const TEXTS: Record<Lang, Texts> = {
@@ -430,6 +433,186 @@ Rules:
 - गेम के लिए: स्मूथ कंट्रोल (कीबोर्ड/टच), स्कोर डिस्प्ले और गेम-ओवर स्क्रीन।
 - वेबसाइट के लिए: नेविगेशन, कई सेक्शन और संपर्क क्षेत्र।`,
   },
+
+  /* ————————————————— Français ————————————————— */
+  fr: {
+    subtitle: "Pages d'accueil, jeux et applications web à partir d'un prompt",
+    statusLoadingNoPct: "Chargement du modèle …",
+    statusLoading: "Chargement du modèle … {pct} %",
+    statusLoadingEta: "Chargement du modèle … {pct} % · encore environ {eta}",
+    statusError: "Le modèle n'a pas pu être chargé",
+    statusReady: "Modèle prêt · tourne dans le navigateur",
+    statusReadyGpu: "Modèle prêt · tourne dans le navigateur (GPU)",
+    statusIdle: "prêt à charger",
+    gpuToggleTitle: "Utiliser le GPU si disponible (plus rapide). Sans GPU, tout fonctionne en mode CPU.",
+    modelSelectTitle: "Choisir un modèle gratuit dans le navigateur",
+    langSelectTitle: "Choisir la langue",
+    newChat: "✦ Nouveau",
+    tabChat: "Discussion",
+    tabResult: "Résultat",
+    welcomeTitle: "Que veux-tu créer ?",
+    welcomeText:
+      "Décris simplement ce dont tu as besoin – page d'accueil, jeu ou petite application web. L'IA tourne entièrement sur cet appareil et t'affiche le code en direct à droite.",
+    hintFree: "100 % gratuit · fonctionne directement dans le navigateur · sans serveur, sans compte, sans clé API",
+    hintFirstLoad:
+      "Au premier démarrage, le modèle est téléchargé une seule fois ({size}) puis mis en cache dans le navigateur.",
+    placeholder: 'ex. "Crée un jeu Snake avec un compteur de points"',
+    submit: "Créer ▶",
+    viewPreview: "Aperçu",
+    viewCode: "Code",
+    openTabTitle: "Ouvrir dans un nouvel onglet",
+    copyTitle: "Copier le code",
+    downloadTitle: "Télécharger index.html",
+    previewEmpty: "Ton résultat apparaît ici – en direct pendant que l'IA écrit le code.",
+    previewHint: "Fonctionne entièrement sur ton appareil – sans serveur, sans clé API.",
+    confirmNewChat: "Vraiment supprimer la discussion actuelle ?",
+    donePreview: "✔ Terminé – ton application est dans l'aperçu.",
+    done: "✔ Terminé.",
+    errorPrefix: "Erreur : ",
+    modelLoadError: "Le modèle n'a pas pu être chargé.",
+    modelFile: "modèle",
+    prevCodeIntro: "Code actuel (apporte des modifications) :",
+    genLabel: "Génération … {pct} %",
+    etaFmt: "environ {m} min {s} s",
+    tokensFmt: "{n} jetons",
+    busyNotes: ["Écrit le code …", "Peaufine le design …", "Presque terminé …"],
+    examples: [
+      { icon: "🌐", label: "Page d'accueil", prompt: "Crée une page d'accueil moderne pour un café italien avec horaires d'ouverture et photos." },
+      { icon: "🐍", label: "Jeu", prompt: "Crée un jeu Snake classique avec compteur de points, affichage du niveau et écran de fin de partie." },
+      { icon: "✅", label: "To-do list", prompt: "Crée une application web de liste de tâches avec ajout, validation, suppression et sauvegarde dans le navigateur." },
+      { icon: "🧮", label: "Calculatrice", prompt: "Crée une belle calculatrice avec contrôle au clavier et historique." },
+    ],
+    system: `Tu es "AI-Coder", un générateur de fichiers HTML uniques. Tu crées des applications web complètes et autonomes sous la forme d'UN fichier index.html avec CSS et JavaScript intégrés.
+
+Règles :
+- Produis uniquement le code HTML complet, dans un seul bloc de code Markdown commençant par \`\`\`html et se terminant par \`\`\`.
+- Aucune explication en dehors du bloc de code.
+- Aucun outil de build ni serveur nécessaire : tout fonctionne hors ligne dans un onglet du navigateur (HTML/CSS/JS pur).
+- Design moderne et attrayant avec variables CSS, responsive (desktop + mobile).
+- Le code doit fonctionner immédiatement – pas d'espaces réservés, pas de commentaires TODO.
+- Pour les jeux : contrôles fluides (clavier/tactile), affichage du score et écran de fin de partie.
+- Pour les sites web : navigation, plusieurs sections et zone de contact.`,
+  },
+
+  /* ————————————————— Español ————————————————— */
+  es: {
+    subtitle: "Páginas de inicio, juegos y aplicaciones web a partir de un prompt",
+    statusLoadingNoPct: "Cargando el modelo …",
+    statusLoading: "Cargando el modelo … {pct} %",
+    statusLoadingEta: "Cargando el modelo … {pct} % · quedan unos {eta}",
+    statusError: "El modelo no pudo cargarse",
+    statusReady: "Modelo listo · funciona en el navegador",
+    statusReadyGpu: "Modelo listo · funciona en el navegador (GPU)",
+    statusIdle: "listo para cargar",
+    gpuToggleTitle: "Usar GPU si está disponible (más rápido). Sin GPU, todo funciona en modo CPU.",
+    modelSelectTitle: "Elegir un modelo gratuito en el navegador",
+    langSelectTitle: "Elegir idioma",
+    newChat: "✦ Nuevo",
+    tabChat: "Chat",
+    tabResult: "Resultado",
+    welcomeTitle: "¿Qué quieres crear?",
+    welcomeText:
+      "Describe simplemente lo que necesitas – página de inicio, juego o pequeña aplicación web. La IA funciona por completo en este dispositivo y te muestra el código en vivo a la derecha.",
+    hintFree: "100 % gratis · funciona directamente en el navegador · sin servidor, sin cuenta, sin clave API",
+    hintFirstLoad:
+      "En el primer inicio, el modelo se descarga una sola vez ({size}) y luego se guarda en la caché del navegador.",
+    placeholder: 'p. ej. "Crea un juego de la serpiente con marcador"',
+    submit: "Crear ▶",
+    viewPreview: "Vista previa",
+    viewCode: "Código",
+    openTabTitle: "Abrir en una pestaña nueva",
+    copyTitle: "Copiar código",
+    downloadTitle: "Descargar index.html",
+    previewEmpty: "Tu resultado aparece aquí – en vivo mientras la IA escribe el código.",
+    previewHint: "Funciona por completo en tu dispositivo – sin servidor, sin clave API.",
+    confirmNewChat: "¿Seguro que quieres borrar el chat actual?",
+    donePreview: "✔ Listo – tu aplicación está en la vista previa.",
+    done: "✔ Listo.",
+    errorPrefix: "Error: ",
+    modelLoadError: "El modelo no pudo cargarse.",
+    modelFile: "modelo",
+    prevCodeIntro: "Código actual (haz cambios en él):",
+    genLabel: "Generando … {pct} %",
+    etaFmt: "unos {m} min {s} s",
+    tokensFmt: "{n} tokens",
+    busyNotes: ["Escribiendo código …", "Puliendo el diseño …", "Casi listo …"],
+    examples: [
+      { icon: "🌐", label: "Página de inicio", prompt: "Crea una página de inicio moderna para un café italiano con horarios y fotos." },
+      { icon: "🐍", label: "Juego", prompt: "Crea un juego clásico de la serpiente con marcador, nivel y pantalla de fin de juego." },
+      { icon: "✅", label: "Lista de tareas", prompt: "Crea una aplicación web de lista de tareas con añadir, marcar, borrar y guardar en el navegador." },
+      { icon: "🧮", label: "Calculadora", prompt: "Crea una bonita calculadora con control por teclado e historial." },
+    ],
+    system: `Eres "AI-Coder", un generador de archivos HTML individuales. Creas aplicaciones web completas y autónomas como UN archivo index.html con CSS y JavaScript integrados.
+
+Reglas:
+- Produce únicamente el código HTML completo, en un solo bloque de código Markdown que empiece con \`\`\`html y termine con \`\`\`.
+- Sin explicaciones fuera del bloque de código.
+- No se necesitan herramientas de compilación ni servidores: todo funciona sin conexión en una pestaña del navegador (HTML/CSS/JS puro).
+- Diseño moderno y atractivo con variables CSS, responsive (escritorio + móvil).
+- El código debe funcionar de inmediato – sin marcadores de posición, sin comentarios TODO.
+- Para juegos: controles fluidos (teclado/táctil), marcador y pantalla de fin de juego.
+- Para sitios web: navegación, varias secciones y zona de contacto.`,
+  },
+
+  /* ————————————————— Kiswahili ————————————————— */
+  sw: {
+    subtitle: "Kurasa za nyumbani, michezo na programu za wavuti kwa prompt",
+    statusLoadingNoPct: "Inapakia mfano …",
+    statusLoading: "Inapakia mfano … {pct} %",
+    statusLoadingEta: "Inapakia mfano … {pct} % · imesalia takriban {eta}",
+    statusError: "Mfano haukuweza kupakiwa",
+    statusReady: "Mfano uko tayari · unafanya kazi kwenye kivinjari",
+    statusReadyGpu: "Mfano uko tayari · unafanya kazi kwenye kivinjari (GPU)",
+    statusIdle: "tayari kupakia",
+    gpuToggleTitle: "Tumia GPU ikiwa inapatikana (haraka zaidi). Bila GPU kila kitu kinafanya kazi kwa njia ya CPU.",
+    modelSelectTitle: "Chagua mfano wa bure wa kivinjari",
+    langSelectTitle: "Chagua lugha",
+    newChat: "✦ Mpya",
+    tabChat: "Mazungumzo",
+    tabResult: "Matokeo",
+    welcomeTitle: "Unataka kuunda nini?",
+    welcomeText:
+      "Eleza tu kile unachohitaji – ukurasa wa nyumbani, mchezo au programu ndogo ya wavuti. AI inafanya kazi kabisa kwenye kifaa chako na inakuonyesha msimbo moja kwa moja upande wa kulia.",
+    hintFree: "Bure 100 % · inafanya kazi moja kwa moja kwenye kivinjari · hakuna seva, hakuna akaunti, hakuna ufunguo wa API",
+    hintFirstLoad:
+      "Mara ya kwanza mfano unapakuliwa mara moja ({size}) kisha unahifadhiwa kwenye kache ya kivinjari.",
+    placeholder: 'mf. "Unda mchezo wa nyoka wenye alama"',
+    submit: "Unda ▶",
+    viewPreview: "Hakiki",
+    viewCode: "Msimbo",
+    openTabTitle: "Fungua kwenye kichupo kipya",
+    copyTitle: "Nakili msimbo",
+    downloadTitle: "Pakua index.html",
+    previewEmpty: "Matokeo yako yataonekana hapa – moja kwa moja huku AI ikiandika msimbo.",
+    previewHint: "Yanaendelea kabisa kwenye kifaa chako – hakuna seva, hakuna ufunguo wa API.",
+    confirmNewChat: "Kweli unataka kufuta mazungumzo ya sasa?",
+    donePreview: "✔ Imekamilika – programu yako iko kwenye hakiki.",
+    done: "✔ Imekamilika.",
+    errorPrefix: "Hitilafu: ",
+    modelLoadError: "Mfano haukuweza kupakiwa.",
+    modelFile: "mfano",
+    prevCodeIntro: "Msimbo wa sasa (fanya mabadiliko juu yake):",
+    genLabel: "Inaunda … {pct} %",
+    etaFmt: "takriban {m} dk {s} sek",
+    tokensFmt: "ishara {n}",
+    busyNotes: ["Inaandika msimbo …", "Inamaliza muundo …", "Karibu kumaliza …"],
+    examples: [
+      { icon: "🌐", label: "Ukurasa wa nyumbani", prompt: "Unda ukurasa wa kisasa wa kivutio kwa mkahawa wa Kiitaliano wenye saa za kufunguliwa na picha." },
+      { icon: "🐍", label: "Mchezo", prompt: "Unda mchezo wa kawaida wa nyoka wenye alama, kiwango na skrini ya mwisho wa mchezo." },
+      { icon: "✅", label: "Orodha ya kazi", prompt: "Unda programu ya wavuti ya orodha ya kazi yenye kuongeza, kuweka alama, kufuta na kuhifadhi kwenye kivinjari." },
+      { icon: "🧮", label: "Kikokotoo", prompt: "Unda kikokotoo kizuri chenye udhibiti wa kibodi na historia." },
+    ],
+    system: `Wewe ni "AI-Coder", kiinjinia cha kuzalisha faili za HTML moja. Unaunda programu kamili za wavuti zinazojitegemea kama faili MOJA ya index.html yenye CSS na JavaScript zilizowekwa ndani.
+
+Sheria:
+- Toa tu msimbo kamili wa HTML, katika kizuizi kimoja cha msimbo cha Markdown kinachoanza na \`\`\`html na kuishia na \`\`\`.
+- Hakuna maelezo nje ya kizuizi cha msimbo.
+- Hakuna zana za ujenzi au seva zinazohitajika: kila kitu kinafanya kazi nje ya mtandao kwenye kichupo cha kivinjari (HTML/CSS/JS safi).
+- Muundo wa kisasa, wa kuvutia wenye vigeu vya CSS, responsive (desktop + simu).
+- Msimbo lazima ufanye kazi mara moja – hakuna maeneo ya mabaki, hakuna maoni ya TODO.
+- Kwa michezo: udhibiti laini (kibodi/kugusa), alama na skrini ya mwisho wa mchezo.
+- Kwa tovuti: urambazaji, sehemu nyingi na eneo la mawasiliano.`,
+  },
 };
 
 const BROWSER_MODELS: BrowserModel[] = [
@@ -504,6 +687,9 @@ function detectLang(): Lang {
       if (b.startsWith("ja")) return "ja";
       if (b.startsWith("zh")) return "zh";
       if (b.startsWith("hi")) return "hi";
+      if (b.startsWith("fr")) return "fr";
+      if (b.startsWith("es")) return "es";
+      if (b.startsWith("sw")) return "sw";
       if (b.startsWith("en")) return "en";
     }
   } catch {
