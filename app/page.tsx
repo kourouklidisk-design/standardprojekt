@@ -834,6 +834,14 @@ const MAX_TOKENS = 2048;
 const PREVIEW_SHIM = `
 <script>
 (function(){
+  // Häufigster Modell-Fehler: undeklarierte Variablen wie \`interval\`, \`timer\`, \`raf\` …
+  // vorbelegen, damit Lesen UND Schreiben nicht crashen (auch unter "use strict",
+  // wo die Zuweisung an eine vorhandene globale Eigenschaft erlaubt ist).
+  var names = ['interval','timer','timeout','raf','intervalId','timerId','gameInterval',
+    'moveInterval','gameTimer','gameLoop','gameOver','rafId','loop','animation'];
+  for (var i = 0; i < names.length; i++) {
+    try { window[names[i]] = null; } catch(e){}
+  }
   function shim(prop){
     try { void window[prop]; return; } catch(e){}
     var store = {};
