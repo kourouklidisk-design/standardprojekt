@@ -56,6 +56,7 @@ type Texts = {
   diagFixIntro: string; // Platzhalter {ids} – Einleitung des Fix-Prompts bei fehlenden Element-IDs
   genFailHint: string; // Hinweis nach einem Generierungs-Crash (Sitzung wird frisch aufgebaut)
   gpuFailHint: string; // Tipp: GPU-Option deaktivieren
+  wasmRetryFailHint: string; // Hinweis: auch der automatische CPU-Zweiteversuch scheiterte → Reload nötig
   gpuFallbackNote: string; // Chat-Hinweis beim automatischen WASM-Fallback nach GPU-Crash
   emptyDiagNote: string; // Hinweistext: erzeugte Seite ist leer (weiße Vorschau)
   emptyDiagFix: string; // Fix-Prompt bei leerer Seite
@@ -135,6 +136,7 @@ const TEXTS: Record<Lang, Texts> = {
     genFailHint:
       "Die fehlgeschlagene Modell-Sitzung wurde verworfen – der nächste Versuch baut sie frisch auf und läuft meist wieder. Einfach noch einmal senden oder „Fehler beheben“ klicken.",
     gpuFailHint: "Tipp: Deaktiviere oben die GPU-Option und versuche es erneut (WASM ist stabiler).",
+    wasmRetryFailHint: "Auch der automatische zweite Versuch (WASM/CPU) ist fehlgeschlagen. Lade die Seite jetzt komplett neu (Strg+F5) und halte ⚡GPU aus – danach läuft es stabil.",
     gpuFallbackNote: "⚠ GPU-Fehler während der Generierung – versuche automatisch mit WASM (CPU) neu …",
     emptyDiagNote:
       "Die Seite ist leer (kein sichtbarer Text, kein Eingabefeld, keine Buttons). Klicke „Fehler beheben“, damit das Modell die App sichtbar aufbaut.",
@@ -218,6 +220,7 @@ Regeln:
     genFailHint:
       "The failed model session was discarded – the next attempt rebuilds it fresh and usually works. Simply send again or click “Fix error”.",
     gpuFailHint: "Tip: disable the GPU option above and try again (WASM is more stable).",
+    wasmRetryFailHint: "The automatic second attempt (WASM/CPU) failed too. Now hard-reload the page (Ctrl+F5) and keep ⚡ GPU off – it will run stably then.",
     gpuFallbackNote: "⚠ GPU error during generation – automatically retrying with WASM (CPU) …",
     emptyDiagNote:
       "The page is empty (no visible text, no input field, no buttons). Click “Fix error” so the model builds a visible app.",
@@ -301,6 +304,7 @@ Rules:
     genFailHint:
       "Η αποτυχημένη συνεδρία του μοντέλου απορρίφθηκε – η επόμενη προσπάθεια τη δημιουργεί από την αρχή και συνήθως λειτουργεί. Απλώς στείλε ξανά ή κάνε κλικ στο „Διόρθωση σφάλματος“.",
     gpuFailHint: "Συμβουλή: Απενεργοποίησε την επιλογή GPU και δοκίμασε ξανά (το WASM είναι πιο σταθερό).",
+    wasmRetryFailHint: "Η δεύτερη αυτόματη προσπάθεια (WASM/CPU) απέτυχε επίσης. Τώρα κάνε εντελή επαναφόρτωση της σελίδας (Ctrl+F5) και κράτα το ⚡GPU ανενεργό – θα δουλεύει σταθερά.",
     gpuFallbackNote: "⚠ Σφάλμα GPU κατά τη δημιουργία – γίνεται αυτόματη επανάληψη με WASM (CPU) …",
     emptyDiagNote:
       "Η σελίδα είναι κενή (κανένα ορατό κείμενο, κανένα πεδίο εισαγωγής, κανένα κουμπί). Κάνε κλικ στο „Διόρθωση σφάλματος“ για να φτιάξει το μοντέλο μια εμφανή εφαρμογή.",
@@ -383,6 +387,7 @@ Rules:
     genFailHint:
       "失敗したモデルセッションは破棄されました – 次の試行で新しく構築され、通常は再び動作します。もう一度送信するか、「エラーを修正」をクリックしてください。",
     gpuFailHint: "ヒント: 上記の GPU オプションを無効にして再試行してください（WASM の方が安定しています）。",
+    wasmRetryFailHint: "自動の2回目の試行（WASM/CPU）も失敗しました。今すぐページを完全に再読み込みし（Ctrl+F5）、⚡GPU をオフのままにしてください。そうすれば安定して動作します。",
     gpuFallbackNote: "⚠ 生成中に GPU エラーが発生しました – WASM（CPU）で自動的に再試行しています…",
     emptyDiagNote:
       "ページが空です（表示されるテキスト、入力フィールド、ボタンがありません）。「エラーを修正」をクリックすると、モデルが目に見えるアプリを作成します。",
@@ -465,6 +470,7 @@ Rules:
     genFailHint:
       "失败的模型会话已被丢弃 – 下次尝试会重新构建，通常即可正常运行。请再次发送或点击“修复错误”。",
     gpuFailHint: "提示：请停用上方的 GPU 选项后重试（WASM 更稳定）。",
+    wasmRetryFailHint: "自动第二次尝试（WASM/CPU）也失败了。现在请完全重新加载页面（Ctrl+F5）并保持 ⚡GPU 关闭，之后即可稳定运行。",
     gpuFallbackNote: "⚠ 生成期间出现 GPU 错误 – 正在自动改用 WASM（CPU）重试…",
     emptyDiagNote:
       "页面为空（没有可见文本、输入框或按钮）。点击“修复错误”，模型将构建一个可见的应用。",
@@ -547,6 +553,7 @@ Rules:
     genFailHint:
       "विफल मॉडल सत्र को हटा दिया गया है – अगला प्रयास इसे नए सिरे से बनाता है और आमतौर पर काम करता है। बस फिर से भेजें या „त्रुटि ठीक करें“ पर क्लिक करें।",
     gpuFailHint: "सुझाव: ऊपर GPU विकल्प बंद करके दोबारा प्रयास करें (WASM अधिक स्थिर है)।",
+    wasmRetryFailHint: "स्वचालित दूसरा प्रयास (WASM/CPU) भी विफल रहा। अब पेज को पूरी तरह फिर से लोड करें (Ctrl+F5) और ⚡GPU बंद रखें – फिर यह स्थिर रूप से चलेगा।",
     gpuFallbackNote: "⚠ जनरेशन के दौरान GPU त्रुटि – WASM (CPU) के साथ स्वचालित रूप से पुनः प्रयास किया जा रहा है…",
     emptyDiagNote:
       "पेज खाली है (कोई दृश्यमान टेक्स्ट, कोई इनपुट फ़ील्ड, कोई बटन नहीं)। „त्रुटि ठीक करें“ पर क्लिक करें ताकि मॉडल एक दृश्यमान ऐप बनाए।",
@@ -630,6 +637,7 @@ Rules:
     genFailHint:
       "La session de modèle ayant échoué a été supprimée – la prochaine tentative la reconstruit et fonctionne généralement. Il suffit de renvoyer ou de cliquer sur « Corriger l'erreur ».",
     gpuFailHint: "Astuce : désactivez l'option GPU ci-dessus et réessayez (WASM est plus stable).",
+    wasmRetryFailHint: "La deuxième tentative automatique (WASM/CPU) a également échoué. Rechargez maintenant complètement la page (Ctrl+F5) et gardez ⚡GPU désactivé – elle fonctionnera alors de façon stable.",
     gpuFallbackNote: "⚠ Erreur GPU pendant la génération – nouvelle tentative automatique avec WASM (CPU) …",
     emptyDiagNote:
       "La page est vide (aucun texte visible, aucun champ de saisie, aucun bouton). Cliquez sur « Corriger l'erreur » pour que le modèle crée une application visible.",
@@ -713,6 +721,7 @@ Règles :
     genFailHint:
       "La sesión de modelo fallida se ha descartado: el siguiente intento la reconstruye desde cero y suele funcionar. Simplemente envía de nuevo o haz clic en « Corregir error ».",
     gpuFailHint: "Consejo: desactiva la opción de GPU de arriba y vuelve a intentarlo (WASM es más estable).",
+    wasmRetryFailHint: "El segundo intento automático (WASM/CPU) también falló. Ahora recarga por completo la página (Ctrl+F5) y mantén ⚡GPU desactivado – así funcionará de forma estable.",
     gpuFallbackNote: "⚠ Error de GPU durante la generación: reintentando automáticamente con WASM (CPU) …",
     emptyDiagNote:
       "La página está vacía (sin texto visible, sin campo de entrada, sin botones). Haz clic en « Corregir error » para que el modelo construya una aplicación visible.",
@@ -796,6 +805,7 @@ Reglas:
     genFailHint:
       "Kika cha mfano kilichoshindwa kimetupwa – jaribio linalofuata linajenga upya na kwa kawaida hufanya kazi. Tuma tena au bofya „Sahihisha hitilafu“.",
     gpuFailHint: "Kidokezo: zima chaguo la GPU hapo juu na ujaribu tena (WASM ni thabiti zaidi).",
+    wasmRetryFailHint: "Majaribio ya pili ya kiotomatiki (WASM/CPU) pameshindwa pia. Sasa pakia upya ukurasa kikamilifu (Ctrl+F5) na uweke ⚡GPU zima – kisha itafanya kazi kwa utulivu.",
     gpuFallbackNote: "⚠ Hitilafu ya GPU wakati wa utengenezaji – inajaribu tena kiotomatiki kwa WASM (CPU) …",
     emptyDiagNote:
       "Ukurasa ni tupu (hakuna maandishi yanayoonekana, hakuna sehemu ya kuingiza, hakuna vitufe). Bofya „Sahihisha hitilafu“ ili muundo uunde programu inayoonekana.",
@@ -879,6 +889,7 @@ Sheria:
     genFailHint:
       "La sessione del modello non riuscita è stata scartata: il prossimo tentativo la ricostruisce da zero e di solito funziona. Basta inviare di nuovo o cliccare su « Correggi errore ».",
     gpuFailHint: "Suggerimento: disattiva l'opzione GPU qui sopra e riprova (WASM è più stabile).",
+    wasmRetryFailHint: "Anche il secondo tentativo automatico (WASM/CPU) è fallito. Ora ricarica completamente la pagina (Ctrl+F5) e tieni ⚡GPU spento – così funzionerà in modo stabile.",
     gpuFallbackNote: "⚠ Errore GPU durante la generazione – riprovo automaticamente con WASM (CPU) …",
     emptyDiagNote:
       "La pagina è vuota (nessun testo visibile, nessun campo di inserimento, nessun pulsante). Clicca su « Correggi errore » per far creare al modello un'applicazione visibile.",
@@ -961,6 +972,7 @@ Regole:
     genFailHint:
       "Başarısız model oturumu atıldı – bir sonraki deneme onu sıfırdan oluşturur ve genellikle çalışır. Tekrar gönderin veya „Hatayı düzelt“e tıklayın.",
     gpuFailHint: "İpucu: Yukarıdaki GPU seçeneğini kapatıp tekrar deneyin (WASM daha stabildir).",
+    wasmRetryFailHint: "Otomatik ikinci deneme de (WASM/CPU) başarısız oldu. Şimdi sayfayı tamamen yeniden yükleyin (Ctrl+F5) ve ⚡GPU'yu kapalı tutun – sonra kararlı çalışır.",
     gpuFallbackNote: "⚠ Oluşturma sırasında GPU hatası – WASM (CPU) ile otomatik yeniden deneniyor…",
     emptyDiagNote:
       "Sayfa boş (görünür metin, giriş alanı veya düğme yok). Modelin görünür bir uygulama oluşturması için „Hatayı düzelt“e tıklayın.",
@@ -1664,8 +1676,12 @@ export default function Home() {
         }
       }
       const emg = err instanceof Error ? err.message : String(err);
+      // didRetry = der automatische WASM-CPU-Zweiteversuch lief UND scheiterte:
+      // dann bringt „GPU deaktivieren" nichts mehr (ist bereits aus) – die
+      // Laufzeit ist nach dem GPU-Absturz verseucht, nur ein Reload hilft.
       let hint = T.genFailHint;
-      if (useGpu) hint += ` ${T.gpuFailHint}`;
+      if (didRetry) hint += ` ${T.wasmRetryFailHint}`;
+      else if (useGpu) hint += ` ${T.gpuFailHint}`;
       const stackLine =
         err instanceof Error && err.stack
           ? err.stack
