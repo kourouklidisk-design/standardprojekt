@@ -1010,6 +1010,10 @@ export default function Home() {
         // Obergrenze: verhindert Worker-Explosion/endlose Init-Zeit auf Rechnern mit sehr vielen Kernen
         env.backends.onnx.wasm.numThreads = Math.min(navigator.hardwareConcurrency || 1, THREAD_CAP);
       }
+      // WASM-Backend vollständig in einem Web-Worker ausführen (proxy=true):
+      // verhindert, dass Modell-Initialisierung und erste Inferenz den Haupt-Thread
+      // blockieren (sonst meldet der Browser „Seite reagiert nicht").
+      env.backends.onnx.wasm.proxy = true;
       const dev = await detectDevice(gpu);
       // q4 für beide Wege: kompatibel mit WebGPU UND WASM, spart Download & Speicher.
       const dtype = "q4";
@@ -1158,6 +1162,9 @@ export default function Home() {
           updateAssistant(assistantMsg.id, { streaming: true });
         },
       });
+
+      // Kurz dem Browser die Chance geben, den Status zu rendern, bevor die Inferenz startet.
+      await new Promise((res) => setTimeout(res, 80));
 
       await r.gen(chatMessages, { max_new_tokens: MAX_TOKENS, do_sample: false, streamer });
 
