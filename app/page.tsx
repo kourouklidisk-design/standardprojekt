@@ -51,6 +51,9 @@ type Texts = {
   previewErrorLabel: string; // Vorspann der Skriptfehler-Meldung in der Vorschau
   fixPromptIntro: string; // Einleitung des Auto-Fix-Prompts (Vorschau-Fehler wird angehängt)
   fixButton: string; // Label der „Fehler beheben"-Schaltfläche
+  previewDiagLabel: string; // Vorspann der Diagnose-Meldung (fehlende Element-IDs)
+  previewDiagIds: string; // Platzhalter {ids} – fehlende Element-IDs
+  diagFixIntro: string; // Platzhalter {ids} – Einleitung des Fix-Prompts bei fehlenden Element-IDs
   previewHint: string;
   confirmNewChat: string;
   donePreview: string;
@@ -124,6 +127,11 @@ const TEXTS: Record<Lang, Texts> = {
     fixPromptIntro:
       "Der letzte generierte Code verursacht in der Vorschau diesen Fehler – korrigiere ihn und gib die komplette, lauffähige HTML-Datei zurück. Fehler:",
     fixButton: "🔧 Fehler beheben",
+    previewDiagLabel: "⚠ Vorschau-Diagnose: ",
+    previewDiagIds:
+      "Diese Element-ID wird im JavaScript verwendet, existiert aber nicht im HTML: {ids}. Klicke „Fehler beheben“, damit das Modell das fehlende Element ergänzt.",
+    diagFixIntro:
+      "Der letzte generierte Code verwendet Element-IDs, die im HTML nicht existieren: {ids}. Ergänze die fehlenden Elemente (z. B. ein <input id=\"...\"> für Eingaben), gleiche alle getElementById-/querySelector-IDs mit dem HTML ab und gib die komplette, lauffähige HTML-Datei zurück.",
     previewHint: "Läuft komplett auf deinem Gerät – kein Server, kein API-Key.",
     confirmNewChat: "Aktuellen Chat wirklich löschen?",
     donePreview: "✔ Fertig – deine App ist in der Vorschau.",
@@ -194,6 +202,11 @@ Regeln:
     fixPromptIntro:
       "The last generated code causes this error in the preview – fix it and return the complete, working HTML file. Error:",
     fixButton: "🔧 Fix error",
+    previewDiagLabel: "⚠ Preview diagnostic: ",
+    previewDiagIds:
+      "This element ID is used by the JavaScript but is missing from the HTML: {ids}. Click “Fix error” so the model adds the missing element.",
+    diagFixIntro:
+      "The last generated code uses element IDs that do not exist in the HTML: {ids}. Add the missing elements (e.g. an <input id=\"...\"> for text input), make every getElementById/querySelector ID match the HTML, and return the complete, working HTML file.",
     previewHint: "Runs entirely on your device – no server, no API key.",
     confirmNewChat: "Really delete the current chat?",
     donePreview: "✔ Done – your app is in the preview.",
@@ -264,6 +277,11 @@ Rules:
     fixPromptIntro:
       "Ο τελευταίος κώδικας που δημιουργήθηκε προκαλεί αυτό το σφάλμα στην προεπισκόπηση – διόρθωσέ το και επέστρεψε το πλήρες, λειτουργικό αρχείο HTML. Σφάλμα:",
     fixButton: "🔧 Διόρθωση σφάλματος",
+    previewDiagLabel: "⚠ Διάγνωση προεπισκόπησης: ",
+    previewDiagIds:
+      "Αυτό το αναγνωριστικό στοιχείου χρησιμοποιείται από την JavaScript αλλά λείπει από το HTML: {ids}. Κάνε κλικ στο „Διόρθωση σφάλματος“ για να προσθέσει το μοντέλο το στοιχείο που λείπει.",
+    diagFixIntro:
+      "Ο τελευταίος κώδικας χρησιμοποιεί αναγνωριστικά στοιχείων που δεν υπάρχουν στο HTML: {ids}. Πρόσθεσε τα στοιχεία που λείπουν (π.χ. ένα <input id=\"...\"> για εισαγωγή κειμένου), ευθυγράμμισε όλα τα getElementById/querySelector IDs με το HTML και επέστρεψε το πλήρες, λειτουργικό αρχείο HTML.",
     previewHint: "Τρέχει εξ ολοκλήρου στη συσκευή σου – χωρίς server, χωρίς API key.",
     confirmNewChat: "Θέλεις σίγουρα να διαγράψεις τη συνομιλία;",
     donePreview: "✔ Έτοιμο – η εφαρμογή σου είναι στην προεπισκόπηση.",
@@ -333,6 +351,11 @@ Rules:
     fixPromptIntro:
       "最後に生成されたコードがプレビューでこのエラーを引き起こしています – 修正して、完全に動作する HTML ファイルを返してください。エラー:",
     fixButton: "🔧 エラーを修正",
+    previewDiagLabel: "⚠ プレビュー診断: ",
+    previewDiagIds:
+      "この要素 ID は JavaScript で使われていますが、HTML に存在しません: {ids}。「エラーを修正」をクリックすると、モデルが不足している要素を追加します。",
+    diagFixIntro:
+      "最後に生成されたコードは、HTML に存在しない要素 ID を使用しています: {ids}。不足している要素（テキスト入力用の <input id=\"...\"> など）を追加し、すべての getElementById/querySelector の ID を HTML と一致させ、完全に動作する HTML ファイルを返してください。",
     previewHint: "すべてお使いのデバイス上で実行 – サーバー不要、APIキー不要。",
     confirmNewChat: "現在のチャットを削除しますか？",
     donePreview: "✔ 完了 – アプリはプレビューにあります。",
@@ -402,6 +425,11 @@ Rules:
     fixPromptIntro:
       "最后生成的代码在预览中引发了此错误 – 请修复它并返回完整的、可正常运行的 HTML 文件。错误：",
     fixButton: "🔧 修复错误",
+    previewDiagLabel: "⚠ 预览诊断：",
+    previewDiagIds:
+      "此元素 ID 在 JavaScript 中使用，但 HTML 中不存在：{ids}。点击“修复错误”，模型会补充缺失的元素。",
+    diagFixIntro:
+      "最后生成的代码使用了 HTML 中不存在的元素 ID：{ids}。请补充缺失的元素（例如用于文本输入的 <input id=\"...\">），使所有 getElementById/querySelector 的 ID 与 HTML 一致，并返回完整、可正常运行的 HTML 文件。",
     previewHint: "完全在你的设备上运行——无需服务器、无需 API 密钥。",
     confirmNewChat: "确定要删除当前聊天吗？",
     donePreview: "✔ 完成——你的应用已在预览中。",
@@ -471,6 +499,11 @@ Rules:
     fixPromptIntro:
       "पिछले जनरेट किए गए कोड से पूर्वावलोकन में यह त्रुटि हो रही है – इसे ठीक करें और पूरी, काम करने वाली HTML फ़ाइल लौटाएं। त्रुटि:",
     fixButton: "🔧 त्रुटि ठीक करें",
+    previewDiagLabel: "⚠ पूर्वावलोकन निदान: ",
+    previewDiagIds:
+      "यह एलिमेंट ID JavaScript में उपयोग होती है, लेकिन HTML में मौजूद नहीं है: {ids}। „त्रुटि ठीक करें“ पर क्लिक करें ताकि मॉडल लापता एलिमेंट जोड़ दे।",
+    diagFixIntro:
+      "पिछले जनरेट किए गए कोड में वे एलिमेंट IDs उपयोग होती हैं जो HTML में मौजूद नहीं हैं: {ids}। लापता एलिमेंट जोड़ें (जैसे टेक्स्ट इनपुट के लिए <input id=\"...\">), सभी getElementById/querySelector IDs को HTML से मिलाएँ और पूरी, काम करने वाली HTML फ़ाइल लौटाएं।",
     previewHint: "पूरी तरह आपके डिवाइस पर चलता है – न कोई सर्वर, न API कुंजी।",
     confirmNewChat: "क्या आप वाकई वर्तमान चैट हटाना चाहते हैं?",
     donePreview: "✔ हो गया – आपका ऐप पूर्वावलोकन में है।",
@@ -541,6 +574,11 @@ Rules:
     fixPromptIntro:
       "Le dernier code généré provoque cette erreur dans l'aperçu – corrige-la et renvoie le fichier HTML complet et fonctionnel. Erreur :",
     fixButton: "🔧 Corriger l'erreur",
+    previewDiagLabel: "⚠ Diagnostic de l'aperçu : ",
+    previewDiagIds:
+      "Cet ID d'élément est utilisé par le JavaScript mais est absent du HTML : {ids}. Cliquez sur « Corriger l'erreur » pour que le modèle ajoute l'élément manquant.",
+    diagFixIntro:
+      "Le dernier code généré utilise des IDs d'éléments qui n'existent pas dans le HTML : {ids}. Ajoute les éléments manquants (par ex. un <input id=\"...\"> pour la saisie de texte), fais correspondre tous les IDs getElementById/querySelector avec le HTML et renvoie le fichier HTML complet et fonctionnel.",
     previewHint: "Fonctionne entièrement sur ton appareil – sans serveur, sans clé API.",
     confirmNewChat: "Vraiment supprimer la discussion actuelle ?",
     donePreview: "✔ Terminé – ton application est dans l'aperçu.",
@@ -611,6 +649,11 @@ Règles :
     fixPromptIntro:
       "El último código generado provoca este error en la vista previa: corrígelo y devuelve el archivo HTML completo y funcional. Error:",
     fixButton: "🔧 Corregir error",
+    previewDiagLabel: "⚠ Diagnóstico de la vista previa: ",
+    previewDiagIds:
+      "Este ID de elemento lo usa el JavaScript, pero no existe en el HTML: {ids}. Haz clic en « Corregir error » para que el modelo añada el elemento que falta.",
+    diagFixIntro:
+      "El último código generado usa IDs de elementos que no existen en el HTML: {ids}. Añade los elementos que faltan (p. ej. un <input id=\"...\"> para escribir texto), haz que todos los IDs de getElementById/querySelector coincidan con el HTML y devuelve el archivo HTML completo y funcional.",
     previewHint: "Funciona por completo en tu dispositivo – sin servidor, sin clave API.",
     confirmNewChat: "¿Seguro que quieres borrar el chat actual?",
     donePreview: "✔ Listo – tu aplicación está en la vista previa.",
@@ -681,6 +724,11 @@ Reglas:
     fixPromptIntro:
       "Msimbo wa mwisho uliozalishwa unasababisha hitilafu hii katika onyesho – lisahihishe na urudishe faili kamili la HTML linalofanya kazi. Hitilafu:",
     fixButton: "🔧 Sahihisha hitilafu",
+    previewDiagLabel: "⚠ Utambuzi wa onyesho: ",
+    previewDiagIds:
+      "Kitambulisho hiki cha kipengele kinatumiwa na JavaScript lakini hakipo kwenye HTML: {ids}. Bofya „Sahihisha hitilafu“ ili muundo uongeze kipengele kinachokosekana.",
+    diagFixIntro:
+      "Msimbo wa mwisho uliozalishwa unatumia vitambulisho vya vitu ambavyo havipo kwenye HTML: {ids}. Ongeza vipengele vinavyokosekana (k.m. <input id=\"...\"> kwa maingizo ya maandishi), linganisha vitambulisho vyote vya getElementById/querySelector na HTML na urudishe faili kamili la HTML linalofanya kazi.",
     previewHint: "Yanaendelea kabisa kwenye kifaa chako – hakuna seva, hakuna ufunguo wa API.",
     confirmNewChat: "Kweli unataka kufuta mazungumzo ya sasa?",
     donePreview: "✔ Imekamilika – programu yako iko kwenye hakiki.",
@@ -751,6 +799,11 @@ Sheria:
     fixPromptIntro:
       "L'ultimo codice generato causa questo errore nell'anteprima – correggilo e restituisci il file HTML completo e funzionante. Errore:",
     fixButton: "🔧 Correggi errore",
+    previewDiagLabel: "⚠ Diagnosi dell'anteprima: ",
+    previewDiagIds:
+      "Questo ID di elemento è usato dal JavaScript ma non esiste nell'HTML: {ids}. Clicca su « Correggi errore » per far aggiungere al modello l'elemento mancante.",
+    diagFixIntro:
+      "L'ultimo codice generato usa ID di elementi che non esistono nell'HTML: {ids}. Aggiungi gli elementi mancanti (es. un <input id=\"...\"> per l'immissione di testo), fai corrispondere tutti gli ID di getElementById/querySelector all'HTML e restituisci il file HTML completo e funzionante.",
     previewHint: "Gira interamente sul tuo dispositivo – niente server, niente chiave API.",
     confirmNewChat: "Vuoi davvero eliminare la chat attuale?",
     donePreview: "✔ Fatto – la tua app è nell'anteprima.",
@@ -820,6 +873,11 @@ Regole:
     fixPromptIntro:
       "Son oluşturulan kod önizlemede şu hataya neden oluyor – hatayı düzelt ve eksiksiz, çalışan HTML dosyasını geri döndür. Hata:",
     fixButton: "🔧 Hatayı düzelt",
+    previewDiagLabel: "⚠ Önizleme teşhisi: ",
+    previewDiagIds:
+      "Bu öğe Kimliği JavaScript tarafından kullanılıyor ancak HTML'de yok: {ids}. Modelin eksik öğeyi eklemesi için „Hatayı düzelt“e tıklayın.",
+    diagFixIntro:
+      "Son oluşturulan kod, HTML'de bulunmayan öğe Kimliklerini kullanıyor: {ids}. Eksik öğeleri ekle (ör. metin girişi için <input id=\"...\">), tüm getElementById/querySelector Kimliklerini HTML ile eşleştir ve eksiksiz, çalışan HTML dosyasını geri döndür.",
     previewHint: "Tamamen cihazında çalışır – sunucu yok, API anahtarı yok.",
     confirmNewChat: "Mevcut sohbeti gerçekten silmek istiyor musun?",
     donePreview: "✔ Tamam – uygulaman önizlemede.",
@@ -946,6 +1004,27 @@ function stripCode(text: string): string {
   return text.replace(/```[\s\S]*?```/g, "").trim();
 }
 
+/** Statische Vorschau-Diagnose: Welche per getElementById/querySelector(#…)
+ *  referenzierten Element-IDs fehlen im generierten HTML? Das ist der häufigste
+ *  Modell-Bug (z. B. `getElementById('task-input')` ohne passendes `<input>`) und
+ *  crasht beim Klicken mit „Cannot read properties of null (reading 'value')". */
+function analyzeMissingIds(html: string): string[] {
+  const known = new Set<string>();
+  const idRe = /\bid=["']([^"']+)["']/g;
+  let m: RegExpExecArray | null;
+  while ((m = idRe.exec(html))) known.add(m[1]);
+
+  const refs = new Set<string>();
+  const getRe = /getElementById\(\s*["']([^"']+)["']\s*\)/g;
+  while ((m = getRe.exec(html))) refs.add(m[1]);
+  const qsRe = /querySelector(?:All)?\(\s*["']#([^"'"\s.:[>]+)["']\s*\)/g;
+  while ((m = qsRe.exec(html))) refs.add(m[1]);
+
+  const missing: string[] = [];
+  for (const id of refs) if (!known.has(id) && !missing.includes(id)) missing.push(id);
+  return missing;
+}
+
 /** Baut den Nutzer-Task inkl. bisherigem Code für Verbesserungen. */
 function buildTaskPrompt(userPrompt: string, previousHtml: string | undefined, prevIntro: string): string {
   let prompt = userPrompt;
@@ -1031,6 +1110,7 @@ export default function Home() {
   const [mobileTab, setMobileTab] = useState<"chat" | "preview">("chat");
   const [copied, setCopied] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const [previewDiag, setPreviewDiag] = useState<string[] | null>(null); // fehlende Element-IDs
   const [genProgress, setGenProgress] = useState<GenProgress | null>(null);
   const [genStartAt, setGenStartAt] = useState<number | null>(null);
   const [, setTick] = useState(0); // löst Re-Render für den Sekunden-Zähler aus
@@ -1151,6 +1231,8 @@ export default function Home() {
       const d = e.data as { type?: string; msg?: unknown } | undefined;
       if (d && d.type === "aicoder-preview-error") {
         setPreviewError(String(d.msg ?? "").replace(/^Error:\s*/i, "").slice(0, 300));
+        // Ein echte Laufzeit-Fehlermeldung ersetzt die statische Diagnose.
+        setPreviewDiag(null);
       }
     };
     window.addEventListener("message", onMsg);
@@ -1312,6 +1394,7 @@ export default function Home() {
     setBusy(true);
     setGenProgress({ pct: 0, etaSec: null, tokens: 0 });
     setPreviewError(null);
+    setPreviewDiag(null);
     streamRef.current = { content: "" };
 
     const genStart = performance.now();
@@ -1402,6 +1485,9 @@ export default function Home() {
       const visible = stripCode(streamRef.current.content);
       // Kein Code erzeugt? Dann nicht roh in die Vorschau werfen, sondern klar melden.
       setPreviewHtml(asCode ? html : "");
+      // Statische Diagnose: fehlende Element-IDs sind der häufigste Modell-Bug und
+      // würden erst beim Klicken crashen – das jetzt schon melden (fixfähig).
+      if (asCode) setPreviewDiag(analyzeMissingIds(html));
       updateAssistant(assistantMsg.id, {
         streaming: false,
         content: asCode
@@ -1423,10 +1509,16 @@ export default function Home() {
     }
   }
 
-  // „Fehler beheben": schickt den Vorschau-Fehler + den bisherigen Code an das Modell,
-  // damit es seinen eigenen Bug korrigiert (nutzt handleSend mit erzwungenem Prompt).
+  // „Fehler beheben": schickt den Vorschau-Fehler bzw. die Diagnose (fehlende
+  // Element-IDs) + den bisherigen Code an das Modell zur Korrektur.
   function fixPreviewError() {
-    if (!previewError || busy) return;
+    if (busy) return;
+    if (previewDiag && previewDiag.length > 0) {
+      const ids = previewDiag.join(", ");
+      handleSend(undefined, `${T.diagFixIntro.replace("{ids}", ids)}\n\n${previewError ?? ""}`);
+      return;
+    }
+    if (!previewError) return;
     handleSend(undefined, `${T.fixPromptIntro}\n\n${previewError}`);
   }
 
@@ -1434,6 +1526,8 @@ export default function Home() {
     if (messages.length > 0 && !window.confirm(T.confirmNewChat)) return;
     setMessages([]);
     setPreviewHtml("");
+    setPreviewError(null);
+    setPreviewDiag(null);
     setInput("");
     setView("preview");
     setMobileTab("chat");
@@ -1689,6 +1783,18 @@ export default function Home() {
               </div>
             ) : view === "preview" ? (
               <>
+                {previewDiag && previewDiag.length > 0 && (
+                  <div className="preview-error-note preview-diag-note">
+                    <span>{T.previewDiagLabel}</span>
+                    <code>{T.previewDiagIds.replace("{ids}", previewDiag.join(", "))}</code>
+                    <button onClick={fixPreviewError} disabled={busy} className="preview-error-fix">
+                      {T.fixButton}
+                    </button>
+                    <button onClick={() => setPreviewDiag(null)} title="✕" className="preview-error-close">
+                      ✕
+                    </button>
+                  </div>
+                )}
                 {previewError && (
                   <div className="preview-error-note">
                     <span>{T.previewErrorLabel}</span>

@@ -497,6 +497,12 @@ form button:disabled {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
+.preview-diag-note {
+  background: #14202e;
+  color: #ffd9a0;
+  border-color: #8a5b1f;
+}
+
 .preview-error-note code {
   flex: 1;
   overflow: hidden;
