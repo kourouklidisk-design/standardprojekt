@@ -56,6 +56,7 @@ type Texts = {
   diagFixIntro: string; // Platzhalter {ids} – Einleitung des Fix-Prompts bei fehlenden Element-IDs
   genFailHint: string; // Hinweis nach einem Generierungs-Crash (Sitzung wird frisch aufgebaut)
   gpuFailHint: string; // Tipp: GPU-Option deaktivieren
+  gpuFallbackNote: string; // Chat-Hinweis beim automatischen WASM-Fallback nach GPU-Crash
   previewHint: string;
   confirmNewChat: string;
   donePreview: string;
@@ -132,6 +133,7 @@ const TEXTS: Record<Lang, Texts> = {
     genFailHint:
       "Die fehlgeschlagene Modell-Sitzung wurde verworfen – der nächste Versuch baut sie frisch auf und läuft meist wieder. Einfach noch einmal senden oder „Fehler beheben“ klicken.",
     gpuFailHint: "Tipp: Deaktiviere oben die GPU-Option und versuche es erneut (WASM ist stabiler).",
+    gpuFallbackNote: "⚠ GPU-Fehler während der Generierung – versuche automatisch mit WASM (CPU) neu …",
     previewDiagLabel: "⚠ Vorschau-Diagnose: ",
     previewDiagIds:
       "Diese Element-ID wird im JavaScript verwendet, existiert aber nicht im HTML: {ids}. Klicke „Fehler beheben“, damit das Modell das fehlende Element ergänzt.",
@@ -210,6 +212,7 @@ Regeln:
     genFailHint:
       "The failed model session was discarded – the next attempt rebuilds it fresh and usually works. Simply send again or click “Fix error”.",
     gpuFailHint: "Tip: disable the GPU option above and try again (WASM is more stable).",
+    gpuFallbackNote: "⚠ GPU error during generation – automatically retrying with WASM (CPU) …",
     previewDiagLabel: "⚠ Preview diagnostic: ",
     previewDiagIds:
       "This element ID is used by the JavaScript but is missing from the HTML: {ids}. Click “Fix error” so the model adds the missing element.",
@@ -288,6 +291,7 @@ Rules:
     genFailHint:
       "Η αποτυχημένη συνεδρία του μοντέλου απορρίφθηκε – η επόμενη προσπάθεια τη δημιουργεί από την αρχή και συνήθως λειτουργεί. Απλώς στείλε ξανά ή κάνε κλικ στο „Διόρθωση σφάλματος“.",
     gpuFailHint: "Συμβουλή: Απενεργοποίησε την επιλογή GPU και δοκίμασε ξανά (το WASM είναι πιο σταθερό).",
+    gpuFallbackNote: "⚠ Σφάλμα GPU κατά τη δημιουργία – γίνεται αυτόματη επανάληψη με WASM (CPU) …",
     previewDiagLabel: "⚠ Διάγνωση προεπισκόπησης: ",
     previewDiagIds:
       "Αυτό το αναγνωριστικό στοιχείου χρησιμοποιείται από την JavaScript αλλά λείπει από το HTML: {ids}. Κάνε κλικ στο „Διόρθωση σφάλματος“ για να προσθέσει το μοντέλο το στοιχείο που λείπει.",
@@ -365,6 +369,7 @@ Rules:
     genFailHint:
       "失敗したモデルセッションは破棄されました – 次の試行で新しく構築され、通常は再び動作します。もう一度送信するか、「エラーを修正」をクリックしてください。",
     gpuFailHint: "ヒント: 上記の GPU オプションを無効にして再試行してください（WASM の方が安定しています）。",
+    gpuFallbackNote: "⚠ 生成中に GPU エラーが発生しました – WASM（CPU）で自動的に再試行しています…",
     previewDiagLabel: "⚠ プレビュー診断: ",
     previewDiagIds:
       "この要素 ID は JavaScript で使われていますが、HTML に存在しません: {ids}。「エラーを修正」をクリックすると、モデルが不足している要素を追加します。",
@@ -442,6 +447,7 @@ Rules:
     genFailHint:
       "失败的模型会话已被丢弃 – 下次尝试会重新构建，通常即可正常运行。请再次发送或点击“修复错误”。",
     gpuFailHint: "提示：请停用上方的 GPU 选项后重试（WASM 更稳定）。",
+    gpuFallbackNote: "⚠ 生成期间出现 GPU 错误 – 正在自动改用 WASM（CPU）重试…",
     previewDiagLabel: "⚠ 预览诊断：",
     previewDiagIds:
       "此元素 ID 在 JavaScript 中使用，但 HTML 中不存在：{ids}。点击“修复错误”，模型会补充缺失的元素。",
@@ -519,6 +525,7 @@ Rules:
     genFailHint:
       "विफल मॉडल सत्र को हटा दिया गया है – अगला प्रयास इसे नए सिरे से बनाता है और आमतौर पर काम करता है। बस फिर से भेजें या „त्रुटि ठीक करें“ पर क्लिक करें।",
     gpuFailHint: "सुझाव: ऊपर GPU विकल्प बंद करके दोबारा प्रयास करें (WASM अधिक स्थिर है)।",
+    gpuFallbackNote: "⚠ जनरेशन के दौरान GPU त्रुटि – WASM (CPU) के साथ स्वचालित रूप से पुनः प्रयास किया जा रहा है…",
     previewDiagLabel: "⚠ पूर्वावलोकन निदान: ",
     previewDiagIds:
       "यह एलिमेंट ID JavaScript में उपयोग होती है, लेकिन HTML में मौजूद नहीं है: {ids}। „त्रुटि ठीक करें“ पर क्लिक करें ताकि मॉडल लापता एलिमेंट जोड़ दे।",
@@ -597,6 +604,7 @@ Rules:
     genFailHint:
       "La session de modèle ayant échoué a été supprimée – la prochaine tentative la reconstruit et fonctionne généralement. Il suffit de renvoyer ou de cliquer sur « Corriger l'erreur ».",
     gpuFailHint: "Astuce : désactivez l'option GPU ci-dessus et réessayez (WASM est plus stable).",
+    gpuFallbackNote: "⚠ Erreur GPU pendant la génération – nouvelle tentative automatique avec WASM (CPU) …",
     previewDiagLabel: "⚠ Diagnostic de l'aperçu : ",
     previewDiagIds:
       "Cet ID d'élément est utilisé par le JavaScript mais est absent du HTML : {ids}. Cliquez sur « Corriger l'erreur » pour que le modèle ajoute l'élément manquant.",
@@ -675,6 +683,7 @@ Règles :
     genFailHint:
       "La sesión de modelo fallida se ha descartado: el siguiente intento la reconstruye desde cero y suele funcionar. Simplemente envía de nuevo o haz clic en « Corregir error ».",
     gpuFailHint: "Consejo: desactiva la opción de GPU de arriba y vuelve a intentarlo (WASM es más estable).",
+    gpuFallbackNote: "⚠ Error de GPU durante la generación: reintentando automáticamente con WASM (CPU) …",
     previewDiagLabel: "⚠ Diagnóstico de la vista previa: ",
     previewDiagIds:
       "Este ID de elemento lo usa el JavaScript, pero no existe en el HTML: {ids}. Haz clic en « Corregir error » para que el modelo añada el elemento que falta.",
@@ -753,6 +762,7 @@ Reglas:
     genFailHint:
       "Kika cha mfano kilichoshindwa kimetupwa – jaribio linalofuata linajenga upya na kwa kawaida hufanya kazi. Tuma tena au bofya „Sahihisha hitilafu“.",
     gpuFailHint: "Kidokezo: zima chaguo la GPU hapo juu na ujaribu tena (WASM ni thabiti zaidi).",
+    gpuFallbackNote: "⚠ Hitilafu ya GPU wakati wa utengenezaji – inajaribu tena kiotomatiki kwa WASM (CPU) …",
     previewDiagLabel: "⚠ Utambuzi wa onyesho: ",
     previewDiagIds:
       "Kitambulisho hiki cha kipengele kinatumiwa na JavaScript lakini hakipo kwenye HTML: {ids}. Bofya „Sahihisha hitilafu“ ili muundo uongeze kipengele kinachokosekana.",
@@ -831,6 +841,7 @@ Sheria:
     genFailHint:
       "La sessione del modello non riuscita è stata scartata: il prossimo tentativo la ricostruisce da zero e di solito funziona. Basta inviare di nuovo o cliccare su « Correggi errore ».",
     gpuFailHint: "Suggerimento: disattiva l'opzione GPU qui sopra e riprova (WASM è più stabile).",
+    gpuFallbackNote: "⚠ Errore GPU durante la generazione – riprovo automaticamente con WASM (CPU) …",
     previewDiagLabel: "⚠ Diagnosi dell'anteprima: ",
     previewDiagIds:
       "Questo ID di elemento è usato dal JavaScript ma non esiste nell'HTML: {ids}. Clicca su « Correggi errore » per far aggiungere al modello l'elemento mancante.",
@@ -908,6 +919,7 @@ Regole:
     genFailHint:
       "Başarısız model oturumu atıldı – bir sonraki deneme onu sıfırdan oluşturur ve genellikle çalışır. Tekrar gönderin veya „Hatayı düzelt“e tıklayın.",
     gpuFailHint: "İpucu: Yukarıdaki GPU seçeneğini kapatıp tekrar deneyin (WASM daha stabildir).",
+    gpuFallbackNote: "⚠ Oluşturma sırasında GPU hatası – WASM (CPU) ile otomatik yeniden deneniyor…",
     previewDiagLabel: "⚠ Önizleme teşhisi: ",
     previewDiagIds:
       "Bu öğe Kimliği JavaScript tarafından kullanılıyor ancak HTML'de yok: {ids}. Modelin eksik öğeyi eklemesi için „Hatayı düzelt“e tıklayın.",
@@ -1441,17 +1453,19 @@ export default function Home() {
     setPreviewDiag(null);
     streamRef.current = { content: "" };
 
-    const genStart = performance.now();
-    setGenStartAt(genStart);
-    let tokenCount = 0;
-    // Token-Rate nur aus den echten Decode-Schritten messen (EWMA). Der Prefill
-    // (Zeit bis zum ersten Token) würde die Durchschnittsrate verwässern und die
-    // Restzeit massiv überschätzen (z. B. „ca. 20 Min" bei tatsächlich ~14 Min).
-    let genTps: number | null = null;
-    let lastTokAt: number | null = null;
+    // Führt die eigentliche Generierung aus (Modell laden, streamen, auswerten).
+    // Wirft bei jedem Fehler – der Aufrufer entscheidet über Fallback bzw. Meldung.
+    const runGeneration = async (gpu: boolean) => {
+      const genStart = performance.now();
+      setGenStartAt(genStart);
+      let tokenCount = 0;
+      // Token-Rate nur aus den echten Decode-Schritten messen (EWMA). Der Prefill
+      // (Zeit bis zum ersten Token) würde die Durchschnittsrate verwässern und die
+      // Restzeit massiv überschätzen (z. B. „ca. 20 Min" bei tatsächlich ~14 Min).
+      let genTps: number | null = null;
+      let lastTokAt: number | null = null;
 
-    try {
-      const r = (await loadPipeline(modelID, useGpu, () => {})) as {
+      const r = (await loadPipeline(modelID, gpu, () => {})) as {
         gen: (messages: unknown[], opts: Record<string, unknown>) => Promise<unknown>;
         tokenizer: unknown;
         TextStreamer: new (tokenizer: unknown, opts: Record<string, unknown>) => unknown;
@@ -1539,6 +1553,11 @@ export default function Home() {
           : `${T.noCode}${visible.trim() ? `\n\n${visible.trim().slice(0, 400)}` : ""}`,
         html: asCode ? html : "",
       });
+    };
+
+    let didRetry = false;
+    try {
+      await runGeneration(useGpu);
       setMobileTab("preview");
     } catch (err) {
       // Generierungs-Crash (z. B. „Cannot read properties of undefined (reading
@@ -1546,6 +1565,23 @@ export default function Home() {
       // kaputte) Modell-Sitzung verwerfen, sonst reproduziert jeder weitere Versuch
       // – auch über „Fehler beheben" – denselben Fehler.
       pipelinesRef.current.delete(`${modelID}|${useGpu ? "gpu" : "cpu"}`);
+      // Die GPU-Laufzeit kann auch NACH erfolgreichem Laden während der Generierung
+      // crashen (siehe Stack: WASM-Funktion im WebGPU-Worker). Dann automatisch
+      // EINMAL auf WASM (CPU) ausweichen – ohne dass der Nutzer etwas umschalten muss.
+      if (useGpu && !didRetry) {
+        didRetry = true;
+        setUseGpu(false);
+        setGenProgress({ pct: 0, etaSec: null, tokens: 0 });
+        streamRef.current = { content: "" };
+        updateAssistant(assistantMsg.id, { streaming: true, content: T.gpuFallbackNote });
+        try {
+          await runGeneration(false);
+          setMobileTab("preview");
+          return;
+        } catch (err2) {
+          err = err2;
+        }
+      }
       const emg = err instanceof Error ? err.message : String(err);
       let hint = T.genFailHint;
       if (useGpu) hint += ` ${T.gpuFailHint}`;
