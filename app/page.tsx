@@ -1391,6 +1391,10 @@ export default function Home() {
       // (die WASM-Funktionstabelle wird zwischen Threads nicht geteilt, emscripten #19307).
       // Daher läuft WASM im Worker immer Single-Thread: stabil, dafür langsamer.
       env.backends.onnx.wasm.numThreads = 1;
+      // Modell-Dateien im Browser-Cache ablegen (einmal laden, danach sofort bereit).
+      // Explizit setzen – ein erneuter Download von ~380 MB pro Reload wäre der
+      // größte Zeitfresser und wirkt sich an wie „hängt beim Vorbereiten".
+      env.useBrowserCache = true;
       const dev = await detectDevice(gpu);
       // q4 für beide Wege: kompatibel mit WebGPU UND WASM, spart Download & Speicher.
       const dtype = "q4";
@@ -1521,8 +1525,6 @@ export default function Home() {
     // Führt die eigentliche Generierung aus (Modell laden, streamen, auswerten).
     // Wirft bei jedem Fehler – der Aufrufer entscheidet über Fallback bzw. Meldung.
     const runGeneration = async (gpu: boolean) => {
-      const genStart = performance.now();
-      setGenStartAt(genStart);
       let tokenCount = 0;
       // Token-Rate nur aus den echten Decode-Schritten messen (EWMA). Der Prefill
       // (Zeit bis zum ersten Token) würde die Durchschnittsrate verwässern und die
@@ -1535,6 +1537,13 @@ export default function Home() {
         tokenizer: unknown;
         TextStreamer: new (tokenizer: unknown, opts: Record<string, unknown>) => unknown;
       };
+      // Erst JETZT läuft echter Prefill – Download/Initialisierung des Modells
+      // zählt nicht mehr als „Vorbereitung" mit (sonst zeigt der Zähler fälschlich
+      // „Vorbereitung seit 5 Min", obwohl nur geladen wurde). Auch der
+      // First-Token-Watchdog darf erst ab hier laufen, sonst feuert ein langsamer
+      // Download ein falsches slowStart, obwohl alles korrekt arbeitet.
+      const genStart = performance.now();
+      setGenStartAt(genStart);
 
       const task = buildTaskPrompt(prompt, lastHtml, T.prevCodeIntro);
       const chatMessages = [
