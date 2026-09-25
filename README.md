@@ -54,11 +54,11 @@ Die App ist **vollständig statisch** – kein Backend, keine Server-Funktionen,
 keine Umgebungsvariablen. Damit läuft sie im kostenlosen Vercel-Hobby-Tarif.
 
 1. Repository auf GitHub pushen und bei [vercel.com/new](https://vercel.com/new) importieren.
-2. Projekt-Name vergeben (z. B. `ai-coder-ai`) → URL `https://ai-coder-ai.vercel.app`.
+2. Projekt-Name vergeben (z. B. `ai-coder-free`) → URL `https://ai-coder-free.vercel.app`.
 3. Deploy – fertig. Es ist nichts weiter zu konfigurieren.
 
-> Namens-Tipp: `ai-coder`, `aicoder`, `ai-coder-app` und `ai-app-builder` sind
-> bereits vergeben. Frei und geprüft: **`ai-coder-ai`** und **`aicoder-app`**.
+> Namens-Tipp: `ai-coder`, `aicoder`, `ai-coder-ai` und `ai-app-builder` sind
+> bereits vergeben. Frei und geprüft: **`ai-coder-free`** und **`aicoder-app`**.
 
 Hinweis: Die App setzt `Cross-Origin-Opener-Policy: same-origin` und
 `Cross-Origin-Embedder-Policy: require-corp` (in `next.config.ts`), damit
