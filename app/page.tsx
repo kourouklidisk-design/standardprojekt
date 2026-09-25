@@ -861,7 +861,7 @@ const PREVIEW_SHIM = `
 // Zusätzliche, sprachunabhängige Ausgabe-Regel – verstärkt die System-Prompt-Regeln,
 // weil kleine Modelle (0.5B) sonst oft Text/Markdown statt Code liefern.
 const OUTPUT_RULE =
-  'CRITICAL: Reply with exactly ONE fenced code block, starting with ```html as the very first characters and ending with the final ```. Inside it: one complete, self-contained, ready-to-run HTML file (embedded CSS and JS). No explanation, no markdown lists, no text outside the code block.';
+  'CRITICAL: Reply with exactly ONE fenced code block, starting with ```html as the very first characters and ending with the final ```. Inside it: one complete, self-contained, ready-to-run HTML file (embedded CSS and JS). No explanation, no markdown lists, no text outside the code block. The JavaScript must run without errors: declare every variable with let or const before using it, never reference an undefined identifier, and only call clearInterval/clearTimeout on values that were actually assigned.';
 const LOAD_TIMEOUT_MS = 120_000; // Watchdog: Session-Initialisierung nach abgeschlossenem Download
 const LOAD_TOTAL_TIMEOUT_MS = 600_000; // Gesamt-Watchdog (auch bei hängendem Download)
 const IMPORT_TIMEOUT_MS = 60_000; // Watchdog: Laden der transformers.js-Laufzeit vom CDN
