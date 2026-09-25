@@ -1123,9 +1123,16 @@ function analyzeMissingIds(html: string): string[] {
 }
 
 /** Erkennt „leere" Seiten: kein sichtbarer Text, kein Eingabefeld, kein Button,
- *  kein Canvas – dann bleibt die Vorschau weiß und die App wirkt nicht erstellt. */
+ *  kein Canvas – dann bleibt die Vorschau weiß und die App wirkt nicht erstellt.
+ *  Wichtig: Nur der <body> zählt als sichtbarer Inhalt – <title>/<meta> im <head>
+ *  sind unsichtbar und dürfen die Messung nicht verfälschen. */
 function assessEmptyPreview(html: string): boolean {
-  const body = html.replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "");
+  const bodyMatch = html.match(/<body[\s\S]*<\/body>/i);
+  const scope = bodyMatch ? bodyMatch[0] : html.replace(/<head[\s\S]*?<\/head>/gi, "");
+  const body = scope
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, " ");
   const text = body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   const hasControl = /<(button|input|textarea|select|a\b|canvas)\b/i.test(body);
   return text.length < 8 && !hasControl;
