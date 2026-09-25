@@ -149,6 +149,50 @@ select {
   cursor: not-allowed;
 }
 
+.lang-select {
+  max-width: 150px;
+}
+
+/* ————— Fortschrittsanzeige (Generierung) ————— */
+.gen-progress {
+  padding: 10px 16px 2px;
+}
+
+.gen-progress-text {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gen-progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.gen-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.4s ease;
+  animation: progress-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes progress-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
 /* ————— Mobile-Umschalter ————— */
 .mobile-tabs {
   display: none;

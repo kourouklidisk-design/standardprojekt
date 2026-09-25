@@ -15,16 +15,114 @@ type ChatMessage = {
 
 type LoadState = "idle" | "loading" | "ready" | "error";
 
+type GenProgress = { pct: number; etaSec: number | null; tokens: number };
+
 type BrowserModel = { id: string; label: string; size: string };
 
-const BROWSER_MODELS: BrowserModel[] = [
-  { id: "onnx-community/Qwen2.5-Coder-0.5B-Instruct", label: "Qwen Coder 0.5B", size: "≈ 500 MB" },
-  { id: "onnx-community/Qwen2.5-Coder-1.5B-Instruct", label: "Qwen Coder 1.5B", size: "≈ 1 GB" },
-];
-const DEFAULT_MODEL = BROWSER_MODELS[0].id;
-const STORAGE_KEY = "ai-coder.v2";
+type Lang = "de" | "en" | "el" | "ja" | "zh" | "hi";
 
-const SYSTEM_INSTRUCTIONS = `Du bist "AI-Coder", ein Generator für einzelne HTML-Dateien. Du erstellst komplette, in sich geschlossene Web-Anwendungen als EINE index.html-Datei mit eingebettetem CSS und JavaScript.
+type Texts = {
+  subtitle: string;
+  statusLoadingNoPct: string;
+  statusLoading: string; // Platzhalter {pct}
+  statusLoadingEta: string; // Platzhalter {pct} und {eta}
+  statusError: string;
+  statusReady: string;
+  statusReadyGpu: string;
+  statusIdle: string;
+  gpuToggleTitle: string;
+  modelSelectTitle: string;
+  langSelectTitle: string;
+  newChat: string;
+  tabChat: string;
+  tabResult: string;
+  welcomeTitle: string;
+  welcomeText: string;
+  hintFree: string;
+  hintFirstLoad: string; // Platzhalter {size}
+  placeholder: string;
+  submit: string;
+  viewPreview: string;
+  viewCode: string;
+  openTabTitle: string;
+  copyTitle: string;
+  downloadTitle: string;
+  previewEmpty: string;
+  previewHint: string;
+  confirmNewChat: string;
+  donePreview: string;
+  done: string;
+  errorPrefix: string;
+  modelLoadError: string;
+  modelFile: string;
+  prevCodeIntro: string;
+  genLabel: string; // Platzhalter {pct}
+  etaFmt: string; // Platzhalter {m} (Minuten) und {s} (Sekunden)
+  tokensFmt: string; // Platzhalter {n}
+  busyNotes: string[];
+  examples: { icon: string; label: string; prompt: string }[];
+  system: string;
+};
+
+const LANGS: { code: Lang; native: string }[] = [
+  { code: "de", native: "Deutsch" },
+  { code: "en", native: "English" },
+  { code: "el", native: "Ελληνικά" },
+  { code: "ja", native: "日本語" },
+  { code: "zh", native: "中文" },
+  { code: "hi", native: "हिन्दी" },
+];
+
+const TEXTS: Record<Lang, Texts> = {
+  /* ————————————————— Deutsch ————————————————— */
+  de: {
+    subtitle: "Homepages, Spiele & Web-Apps per Prompt",
+    statusLoadingNoPct: "Modell wird geladen …",
+    statusLoading: "Modell wird geladen … {pct} %",
+    statusLoadingEta: "Modell wird geladen … {pct} % · noch ca. {eta}",
+    statusError: "Modell konnte nicht geladen werden",
+    statusReady: "Modell bereit · läuft im Browser",
+    statusReadyGpu: "Modell bereit · läuft im Browser (GPU)",
+    statusIdle: "bereit zu laden",
+    gpuToggleTitle: "GPU nutzen, falls vorhanden (schneller). Ohne GPU läuft alles im CPU-Modus.",
+    modelSelectTitle: "Kostenloses Browser-Modell wählen",
+    langSelectTitle: "Sprache wählen",
+    newChat: "✦ Neu",
+    tabChat: "Chat",
+    tabResult: "Ergebnis",
+    welcomeTitle: "Was möchtest du bauen?",
+    welcomeText:
+      "Beschreib einfach, was du brauchst – Homepage, Spiel oder kleine Web-App. Die KI läuft dabei komplett auf diesem Gerät und zeigt dir den Code live an.",
+    hintFree: "100 % kostenlos · läuft direkt im Browser · kein Server, kein Account, kein API-Key",
+    hintFirstLoad:
+      "Beim ersten Start wird das Modell einmalig heruntergeladen ({size}) und danach im Browser zwischengespeichert.",
+    placeholder: 'z. B. "Erstelle ein Snake-Spiel mit Punktestand"',
+    submit: "Erstellen ▶",
+    viewPreview: "Vorschau",
+    viewCode: "Code",
+    openTabTitle: "In neuem Tab öffnen",
+    copyTitle: "Code kopieren",
+    downloadTitle: "index.html herunterladen",
+    previewEmpty: "Dein Ergebnis erscheint hier – live während die KI den Code schreibt.",
+    previewHint: "Läuft komplett auf deinem Gerät – kein Server, kein API-Key.",
+    confirmNewChat: "Aktuellen Chat wirklich löschen?",
+    donePreview: "✔ Fertig – deine App ist in der Vorschau.",
+    done: "✔ Fertig.",
+    errorPrefix: "Fehler: ",
+    modelLoadError: "Das Modell konnte nicht geladen werden.",
+    modelFile: "Modell",
+    prevCodeIntro: "Aktueller Code (nimm Änderungen daran vor):",
+    genLabel: "Generiere … {pct} %",
+    etaFmt: "ca. {m} Min {s} Sek",
+    tokensFmt: "{n} Tokens",
+    busyNotes: ["Schreibt Code …", "Design wird abgerundet …", "Fast fertig …"],
+    examples: [
+      { icon: "🌐", label: "Landingpage", prompt: "Erstelle eine moderne Landingpage für ein italienisches Café mit Öffnungszeiten und Fotos." },
+      { icon: "🐍", label: "Spiel", prompt: "Baue ein klassisches Snake-Spiel mit Punktestand, Level-Display und Game-Over-Ansicht." },
+      { icon: "✅", label: "To-Do-App", prompt: "Erstelle eine To-Do-Liste als Web-App mit Addieren, Abhaken, Löschen und Speichern im Browser." },
+      { icon: "🧮", label: "Rechner", prompt: "Baue einen schönen Taschenrechner mit Tastatursteuerung und Verlauf." },
+    ],
+    system: `Du bist "AI-Coder", ein Generator für einzelne HTML-Dateien. Du erstellst komplette, in sich geschlossene Web-Anwendungen als EINE index.html-Datei mit eingebettetem CSS und JavaScript.
 
 Regeln:
 - Gib ausschließlich den vollständigen HTML-Code aus, in einem einzigen Markdown-Codeblock, der mit \`\`\`html beginnt und mit \`\`\` endet.
@@ -33,16 +131,314 @@ Regeln:
 - Modernes, ansprechendes Design mit CSS-Variablen, responsiv (Desktop + Mobil).
 - Der Code muss sofort lauffähig sein – keine Platzhalter, keine TODO-Kommentare.
 - Für Spiele: flüssige Steuerung (Tastatur/Touch), Punktestand und Game-Over-Ansicht.
-- Für Webseiten: Navigation, mehrere Sektionen und Kontaktbereich.`;
+- Für Webseiten: Navigation, mehrere Sektionen und Kontaktbereich.`,
+  },
 
-const EXAMPLES: { icon: string; label: string; prompt: string }[] = [
-  { icon: "🌐", label: "Landingpage", prompt: "Erstelle eine moderne Landingpage für ein italienisches Café mit Öffnungszeiten und Fotos." },
-  { icon: "🐍", label: "Spiel", prompt: "Baue ein klassisches Snake-Spiel mit Punktestand, Level-Display und Game-Over-Ansicht." },
-  { icon: "✅", label: "To-Do-App", prompt: "Erstelle eine To-Do-Liste als Web-App mit Addieren, Abhaken, Löschen und Speichern im Browser." },
-  { icon: "🧮", label: "Rechner", prompt: "Baue einen schönen Taschenrechner mit Tastatursteuerung und Verlauf." },
+  /* ————————————————— English ————————————————— */
+  en: {
+    subtitle: "Homepages, games & web apps from a prompt",
+    statusLoadingNoPct: "Loading model …",
+    statusLoading: "Loading model … {pct} %",
+    statusLoadingEta: "Loading model … {pct} % · about {eta} left",
+    statusError: "Model could not be loaded",
+    statusReady: "Model ready · running in the browser",
+    statusReadyGpu: "Model ready · running in the browser (GPU)",
+    statusIdle: "ready to load",
+    gpuToggleTitle: "Use GPU if available (faster). Without GPU everything runs in CPU mode.",
+    modelSelectTitle: "Choose a free browser model",
+    langSelectTitle: "Choose language",
+    newChat: "✦ New",
+    tabChat: "Chat",
+    tabResult: "Result",
+    welcomeTitle: "What do you want to build?",
+    welcomeText:
+      "Just describe what you need – homepage, game or small web app. The AI runs entirely on this device and shows you the code live on the right.",
+    hintFree: "100 % free · runs directly in the browser · no server, no account, no API key",
+    hintFirstLoad:
+      "On first start the model is downloaded once ({size}) and then cached in your browser.",
+    placeholder: 'e.g. "Create a Snake game with a score counter"',
+    submit: "Create ▶",
+    viewPreview: "Preview",
+    viewCode: "Code",
+    openTabTitle: "Open in new tab",
+    copyTitle: "Copy code",
+    downloadTitle: "Download index.html",
+    previewEmpty: "Your result appears here – live while the AI writes the code.",
+    previewHint: "Runs entirely on your device – no server, no API key.",
+    confirmNewChat: "Really delete the current chat?",
+    donePreview: "✔ Done – your app is in the preview.",
+    done: "✔ Done.",
+    errorPrefix: "Error: ",
+    modelLoadError: "The model could not be loaded.",
+    modelFile: "model",
+    prevCodeIntro: "Current code (make changes to it):",
+    genLabel: "Generating … {pct} %",
+    etaFmt: "about {m} min {s} s",
+    tokensFmt: "{n} tokens",
+    busyNotes: ["Writing code …", "Polishing design …", "Almost done …"],
+    examples: [
+      { icon: "🌐", label: "Landing page", prompt: "Create a modern landing page for an Italian café with opening hours and photos." },
+      { icon: "🐍", label: "Game", prompt: "Build a classic Snake game with a score counter, level display and game-over screen." },
+      { icon: "✅", label: "To-do app", prompt: "Create a to-do list web app with adding, checking off, deleting and saving in the browser." },
+      { icon: "🧮", label: "Calculator", prompt: "Build a nice calculator with keyboard controls and a history." },
+    ],
+    system: `You are "AI-Coder", a generator for single HTML files. You create complete, self-contained web applications as ONE index.html file with embedded CSS and JavaScript.
+
+Rules:
+- Output only the complete HTML code, in a single Markdown code block starting with \`\`\`html and ending with \`\`\`.
+- No explanations outside the code block.
+- No build tools or servers needed: everything runs offline in a browser tab (vanilla HTML/CSS/JS).
+- Modern, appealing design with CSS variables, responsive (desktop + mobile).
+- The code must work immediately – no placeholders, no TODO comments.
+- For games: smooth controls (keyboard/touch), score display and game-over screen.
+- For websites: navigation, multiple sections and a contact area.`,
+  },
+
+  /* ————————————————— Ελληνικά ————————————————— */
+  el: {
+    subtitle: "Ιστοσελίδες, παιχνίδια και web εφαρμογές με prompt",
+    statusLoadingNoPct: "Φόρτωση μοντέλου …",
+    statusLoading: "Φόρτωση μοντέλου … {pct} %",
+    statusLoadingEta: "Φόρτωση μοντέλου … {pct} % · απομένουν περίπου {eta}",
+    statusError: "Το μοντέλο δεν μπόρεσε να φορτωθεί",
+    statusReady: "Το μοντέλο είναι έτοιμο · τρέχει στο πρόγραμμα περιήγησης",
+    statusReadyGpu: "Το μοντέλο είναι έτοιμο · τρέχει στο πρόγραμμα περιήγησης (GPU)",
+    statusIdle: "έτοιμο προς φόρτωση",
+    gpuToggleTitle: "Χρησιμοποίησε GPU αν υπάρχει (γρηγορότερο). Χωρίς GPU όλα τρέχουν σε λειτουργία CPU.",
+    modelSelectTitle: "Επίλεξε δωρεάν μοντέλο στο πρόγραμμα περιήγησης",
+    langSelectTitle: "Επίλεξε γλώσσα",
+    newChat: "✦ Νέο",
+    tabChat: "Συνομιλία",
+    tabResult: "Αποτέλεσμα",
+    welcomeTitle: "Τι θέλεις να φτιάξεις;",
+    welcomeText:
+      "Περίγραψε απλά τι χρειάζεσαι – ιστοσελίδα, παιχνίδι ή μικρή web εφαρμογή. Η AI τρέχει εξ ολοκλήρου στη συσκευή σου και σου δείχνει τον κώδικα ζωντανά στα δεξιά.",
+    hintFree: "100 % δωρεάν · τρέχει απευθείας στον browser · χωρίς server, χωρίς λογαριασμό, χωρίς API key",
+    hintFirstLoad:
+      "Στην πρώτη εκκίνηση το μοντέλο κατεβαίνει μία φορά ({size}) και μετά μένει στην κρυφή μνήμη του browser.",
+    placeholder: 'π.χ. "Φτιάξε ένα παιχνίδι Snake με μετρητή πόντων"',
+    submit: "Δημιουργία ▶",
+    viewPreview: "Προεπισκόπηση",
+    viewCode: "Κώδικας",
+    openTabTitle: "Άνοιγμα σε νέα καρτέλα",
+    copyTitle: "Αντιγραφή κώδικα",
+    downloadTitle: "Λήψη index.html",
+    previewEmpty: "Το αποτέλεσμά σου εμφανίζεται εδώ – ζωντανά όσο η AI γράφει τον κώδικα.",
+    previewHint: "Τρέχει εξ ολοκλήρου στη συσκευή σου – χωρίς server, χωρίς API key.",
+    confirmNewChat: "Θέλεις σίγουρα να διαγράψεις τη συνομιλία;",
+    donePreview: "✔ Έτοιμο – η εφαρμογή σου είναι στην προεπισκόπηση.",
+    done: "✔ Έτοιμο.",
+    errorPrefix: "Σφάλμα: ",
+    modelLoadError: "Το μοντέλο δεν μπόρεσε να φορτωθεί.",
+    modelFile: "μοντέλο",
+    prevCodeIntro: "Τρέχων κώδικας (κάνε αλλαγές σε αυτόν):",
+    genLabel: "Δημιουργία … {pct} %",
+    etaFmt: "περίπου {m} λεπ. {s} δευτ.",
+    tokensFmt: "{n} tokens",
+    busyNotes: ["Γράφει κώδικα …", "Ολοκληρώνει το σχέδιο …", "Σχεδόν έτοιμο …"],
+    examples: [
+      { icon: "🌐", label: "Σελίδα προορισμού", prompt: "Δημιούργησε μια μοντέρνα σελίδα προορισμού για ένα ιταλικό καφέ με ώρες λειτουργίας και φωτογραφίες." },
+      { icon: "🐍", label: "Παιχνίδι", prompt: "Φτιάξε ένα κλασικό παιχνίδι φιδιού (Snake) με μετρητή πόντων, ένδειξη επιπέδου και οθόνη game-over." },
+      { icon: "✅", label: "Λίστα εργασιών", prompt: "Δημιούργησε μια λίστα εργασιών (to-do) ως web εφαρμογή με προσθήκη, ολοκλήρωση, διαγραφή και αποθήκευση στον browser." },
+      { icon: "🧮", label: "Αριθμομηχανή", prompt: "Φτιάξε μια όμορφη αριθμομηχανή με έλεγχο πληκτρολογίου και ιστορικό." },
+    ],
+    system: `Είσαι ο "AI-Coder", ένας δημιουργός μεμονωμένων αρχείων HTML. Δημιουργείς πλήρεις, αυτόνομες διαδικτυακές εφαρμογές ως ΕΝΑ αρχείο index.html με ενσωματωμένο CSS και JavaScript.
+
+Κανόνες:
+- Εξάγεις μόνο τον πλήρη κώδικα HTML, σε ένα μόνο μπλοκ κώδικα Markdown που αρχίζει με \`\`\`html και τελειώνει με \`\`\`.
+- Καμία επεξήγηση εκτός του μπλοκ κώδικα.
+- Δεν χρειάζονται build tools ή server: όλα τρέχουν offline σε μια καρτέλα του προγράμματος περιήγησης (vanilla HTML/CSS/JS).
+- Μοντέρνο, ελκυστικό σχέδιο με CSS μεταβλητές, responsive (desktop + κινητό).
+- Ο κώδικας πρέπει να λειτουργεί αμέσως – χωρίς placeholders, χωρίς σχόλια TODO.
+- Για παιχνίδια: ομαλός χειρισμός (πληκτρολόγιο/αφή), σκορ και οθόνη game-over.
+- Για ιστοσελίδες: πλοήγηση, πολλαπλές ενότητες και περιοχή επικοινωνίας.`,
+  },
+
+  /* ————————————————— 日本語 ————————————————— */
+  ja: {
+    subtitle: "プロンプトからホームページ・ゲーム・Webアプリ",
+    statusLoadingNoPct: "モデルを読み込み中 …",
+    statusLoading: "モデルを読み込み中 … {pct} %",
+    statusLoadingEta: "モデルを読み込み中 … {pct} % · 残り約 {eta}",
+    statusError: "モデルを読み込めませんでした",
+    statusReady: "モデル準備完了 · ブラウザで実行中",
+    statusReadyGpu: "モデル準備完了 · ブラウザで実行中（GPU）",
+    statusIdle: "読み込み準備完了",
+    gpuToggleTitle: "利用可能ならGPUを使います（高速）。GPUがない場合はCPUモードで動作します。",
+    modelSelectTitle: "無料のブラウザモデルを選択",
+    langSelectTitle: "言語を選択",
+    newChat: "✦ 新規",
+    tabChat: "チャット",
+    tabResult: "結果",
+    welcomeTitle: "何を作りたいですか？",
+    welcomeText:
+      "ホームページ、ゲーム、小さなWebアプリなど、必要なものを説明するだけです。AIはすべてこのデバイス上で動作し、コードを右側にライブ表示します。",
+    hintFree: "100%無料 · ブラウザ内で直接実行 · サーバー不要、アカウント不要、APIキー不要",
+    hintFirstLoad: "初回起動時、モデルが一度だけダウンロードされ（{size}）、その後ブラウザにキャッシュされます。",
+    placeholder: '例：「スコアカウンター付きのスネークゲームを作って」',
+    submit: "作成 ▶",
+    viewPreview: "プレビュー",
+    viewCode: "コード",
+    openTabTitle: "新しいタブで開く",
+    copyTitle: "コードをコピー",
+    downloadTitle: "index.htmlをダウンロード",
+    previewEmpty: "AIがコードを書いている間、ここに結果がライブ表示されます。",
+    previewHint: "すべてお使いのデバイス上で実行 – サーバー不要、APIキー不要。",
+    confirmNewChat: "現在のチャットを削除しますか？",
+    donePreview: "✔ 完了 – アプリはプレビューにあります。",
+    done: "✔ 完了。",
+    errorPrefix: "エラー: ",
+    modelLoadError: "モデルを読み込めませんでした。",
+    modelFile: "モデル",
+    prevCodeIntro: "現在のコード（これに変更を加えてください）:",
+    genLabel: "生成中 … {pct} %",
+    etaFmt: "約{m}分{s}秒",
+    tokensFmt: "{n}トークン",
+    busyNotes: ["コードを書いています …", "デザインを仕上げています …", "もうすぐ完成 …"],
+    examples: [
+      { icon: "🌐", label: "ランディングページ", prompt: "営業時間と写真付きのイタリアンカフェ向けモダンなランディングページを作成してください。" },
+      { icon: "🐍", label: "ゲーム", prompt: "スコアカウンター、レベル表示、ゲームオーバー画面付きのクラシックなスネークゲームを作成してください。" },
+      { icon: "✅", label: "To-Doアプリ", prompt: "追加、チェック、削除、ブラウザへの保存ができるTo-DoリストのWebアプリを作成してください。" },
+      { icon: "🧮", label: "電卓", prompt: "キーボード操作と履歴付きの美しい電卓を作成してください。" },
+    ],
+    system: `あなたは「AI-Coder」、単一のHTMLファイルを生成するツールです。完全で自己完結したウェブアプリケーションを、CSSとJavaScriptを埋め込んだ1つのindex.htmlファイルとして作成してください。
+
+ルール:
+- \`\`\`html で始まり \`\`\` で終わる、単一のMarkdownコードブロック内に、完全なHTMLコードのみを出力してください。
+- コードブロックの外に説明を書かないでください。
+- ビルドツールやサーバーは不要です: すべてブラウザタブ内でオフラインで動作します（vanilla HTML/CSS/JS）。
+- CSS変数を使ったモダンで魅力的なデザイン、レスポンシブ（デスクトップ＋モバイル）。
+- コードはすぐに実行できるものでなければなりません – プレースホルダーやTODOコメントは禁止です。
+- ゲームの場合: スムーズな操作（キーボード/タッチ）、スコア表示、ゲームオーバー画面。
+- ウェブサイトの場合: ナビゲーション、複数のセクション、お問い合わせエリア。`,
+  },
+
+  /* ————————————————— 中文 ————————————————— */
+  zh: {
+    subtitle: "通过提示词创建主页、游戏和 Web 应用",
+    statusLoadingNoPct: "正在加载模型 …",
+    statusLoading: "正在加载模型 … {pct} %",
+    statusLoadingEta: "正在加载模型 … {pct} % · 剩余约 {eta}",
+    statusError: "无法加载模型",
+    statusReady: "模型就绪 · 正在浏览器中运行",
+    statusReadyGpu: "模型就绪 · 正在浏览器中运行（GPU）",
+    statusIdle: "准备加载",
+    gpuToggleTitle: "如果有 GPU 则使用 GPU（更快）。没有 GPU 时以 CPU 模式运行。",
+    modelSelectTitle: "选择免费浏览器模型",
+    langSelectTitle: "选择语言",
+    newChat: "✦ 新建",
+    tabChat: "聊天",
+    tabResult: "结果",
+    welcomeTitle: "你想构建什么？",
+    welcomeText:
+      "简单描述你的需求——主页、游戏或小型 Web 应用。AI 完全在你的设备上运行，并在右侧实时显示代码。",
+    hintFree: "100% 免费 · 直接在浏览器中运行 · 无需服务器、无需账号、无需 API 密钥",
+    hintFirstLoad: "首次启动时会下载一次模型（{size}），之后缓存在浏览器中。",
+    placeholder: '例如："创建一个带计分器的贪吃蛇游戏"',
+    submit: "创建 ▶",
+    viewPreview: "预览",
+    viewCode: "代码",
+    openTabTitle: "在新标签页中打开",
+    copyTitle: "复制代码",
+    downloadTitle: "下载 index.html",
+    previewEmpty: "你的结果会在这里实时显示——AI 编写代码的同时。",
+    previewHint: "完全在你的设备上运行——无需服务器、无需 API 密钥。",
+    confirmNewChat: "确定要删除当前聊天吗？",
+    donePreview: "✔ 完成——你的应用已在预览中。",
+    done: "✔ 完成。",
+    errorPrefix: "错误：",
+    modelLoadError: "无法加载模型。",
+    modelFile: "模型",
+    prevCodeIntro: "当前代码（请在此基础上修改）：",
+    genLabel: "生成中 … {pct} %",
+    etaFmt: "约{m}分{s}秒",
+    tokensFmt: "{n} 个 Token",
+    busyNotes: ["正在编写代码 …", "正在完善设计 …", "即将完成 …"],
+    examples: [
+      { icon: "🌐", label: "落地页", prompt: "为一个意大利咖啡馆创建一个现代落地页，包含营业时间和照片。" },
+      { icon: "🐍", label: "游戏", prompt: "创建一个经典贪吃蛇游戏，包含计分器、等级显示和游戏结束界面。" },
+      { icon: "✅", label: "待办应用", prompt: "创建一个待办事项 Web 应用，支持添加、勾选、删除并在浏览器中保存。" },
+      { icon: "🧮", label: "计算器", prompt: "创建一个漂亮的计算器，支持键盘操作和历史记录。" },
+    ],
+    system: `你是 "AI-Coder"，一个生成单个 HTML 文件的工具。请创建完整、自包含的 Web 应用程序，作为一个 index.html 文件，内嵌 CSS 和 JavaScript。
+
+规则：
+- 只输出完整的 HTML 代码，放在一个 Markdown 代码块中，以 \`\`\`html 开头，以 \`\`\` 结尾。
+- 代码块外不写任何解释。
+- 不需要构建工具或服务器：一切都在浏览器标签页中离线运行（原生 HTML/CSS/JS）。
+- 使用 CSS 变量，现代、美观的设计，响应式（桌面端 + 移动端）。
+- 代码必须立即可运行——不要占位符，不要 TODO 注释。
+- 游戏：流畅的操作（键盘/触摸）、分数显示和游戏结束界面。
+- 网页：导航、多个版块和联系区域。`,
+  },
+
+  /* ————————————————— हिन्दी ————————————————— */
+  hi: {
+    subtitle: "प्रॉम्प्ट से होमपेज, गेम और वेब ऐप",
+    statusLoadingNoPct: "मॉडल लोड हो रहा है …",
+    statusLoading: "मॉडल लोड हो रहा है … {pct} %",
+    statusLoadingEta: "मॉडल लोड हो रहा है … {pct} % · लगभग {eta} शेष",
+    statusError: "मॉडल लोड नहीं हो सका",
+    statusReady: "मॉडल तैयार · ब्राउज़र में चल रहा है",
+    statusReadyGpu: "मॉडल तैयार · ब्राउज़र में चल रहा है (GPU)",
+    statusIdle: "लोड करने के लिए तैयार",
+    gpuToggleTitle: "उपलब्ध होने पर GPU का उपयोग करें (तेज़)। GPU न होने पर सब कुछ CPU मोड में चलता है।",
+    modelSelectTitle: "मुफ्त ब्राउज़र मॉडल चुनें",
+    langSelectTitle: "भाषा चुनें",
+    newChat: "✦ नया",
+    tabChat: "चैट",
+    tabResult: "परिणाम",
+    welcomeTitle: "आप क्या बनाना चाहते हैं?",
+    welcomeText:
+      "बस बताएं कि आपको क्या चाहिए – होमपेज, गेम या छोटा वेब ऐप। AI पूरी तरह से आपके डिवाइस पर चलती है और दाईं ओर कोड लाइव दिखाती है।",
+    hintFree: "100% मुफ्त · सीधे ब्राउज़र में चलता है · न कोई सर्वर, न खाता, न API कुंजी",
+    hintFirstLoad: "पहली बार शुरू करने पर मॉडल एक बार डाउनलोड होता है ({size}) और फिर ब्राउज़र में कैश हो जाता है।",
+    placeholder: 'जैसे "स्कोर काउंटर के साथ स्नेक गेम बनाएं"',
+    submit: "बनाएं ▶",
+    viewPreview: "पूर्वावलोकन",
+    viewCode: "कोड",
+    openTabTitle: "नए टैब में खोलें",
+    copyTitle: "कोड कॉपी करें",
+    downloadTitle: "index.html डाउनलोड करें",
+    previewEmpty: "आपका परिणाम यहाँ दिखाई देगा – AI कोड लिखते समय लाइव।",
+    previewHint: "पूरी तरह आपके डिवाइस पर चलता है – न कोई सर्वर, न API कुंजी।",
+    confirmNewChat: "क्या आप वाकई वर्तमान चैट हटाना चाहते हैं?",
+    donePreview: "✔ हो गया – आपका ऐप पूर्वावलोकन में है।",
+    done: "✔ हो गया।",
+    errorPrefix: "त्रुटि: ",
+    modelLoadError: "मॉडल लोड नहीं हो सका।",
+    modelFile: "मॉडल",
+    prevCodeIntro: "वर्तमान कोड (इसमें बदलाव करें):",
+    genLabel: "बना रहे हैं … {pct} %",
+    etaFmt: "लगभग {m} मिनट {s} सेकंड",
+    tokensFmt: "{n} टोकन",
+    busyNotes: ["कोड लिख रहा है …", "डिज़ाइन को अंतिम रूप दे रहा है …", "लगभग तैयार …"],
+    examples: [
+      { icon: "🌐", label: "लैंडिंग पेज", prompt: "खुलने के समय और तस्वीरों के साथ एक इतालवी कैफ़े के लिए एक आधुनिक लैंडिंग पेज बनाएं।" },
+      { icon: "🐍", label: "गेम", prompt: "स्कोर काउंटर, लेवल डिस्प्ले और गेम-ओवर स्क्रीन के साथ एक क्लासिक स्नेक गेम बनाएं।" },
+      { icon: "✅", label: "टू-डू ऐप", prompt: "एक टू-डू लिस्ट वेब ऐप बनाएं जिसमें जोड़ना, टिक करना, हटाना और ब्राउज़र में सेव करना हो।" },
+      { icon: "🧮", label: "कैलकुलेटर", prompt: "कीबोर्ड नियंत्रण और इतिहास के साथ एक सुंदर कैलकुलेटर बनाएं।" },
+    ],
+    system: `आप "AI-Coder" हैं, जो एकल HTML फ़ाइलें बनाने वाला एक टूल है। आप CSS और JavaScript के साथ एक index.html फ़ाइल के रूप में पूर्ण, स्व-निहित वेब एप्लिकेशन बनाते हैं।
+
+नियम:
+- केवल पूरा HTML कोड आउटपुट करें, एक Markdown कोड ब्लॉक में जो \`\`\`html से शुरू होता है और \`\`\` पर समाप्त होता है।
+- कोड ब्लॉक के बाहर कोई स्पष्टीकरण नहीं।
+- कोई बिल्ड टूल या सर्वर नहीं चाहिए: सब कुछ ब्राउज़र टैब में ऑफ़लाइन चलता है (वेनिला HTML/CSS/JS)।
+- CSS वेरिएबल्स के साथ आधुनिक, आकर्षक डिज़ाइन, रिस्पॉन्सिव (डेस्कटॉप + मोबाइल)।
+- कोड तुरंत चलने योग्य होना चाहिए – कोई प्लेसहोल्डर नहीं, कोई TODO टिप्पणी नहीं।
+- गेम के लिए: स्मूथ कंट्रोल (कीबोर्ड/टच), स्कोर डिस्प्ले और गेम-ओवर स्क्रीन।
+- वेबसाइट के लिए: नेविगेशन, कई सेक्शन और संपर्क क्षेत्र।`,
+  },
+};
+
+const BROWSER_MODELS: BrowserModel[] = [
+  { id: "onnx-community/Qwen2.5-Coder-0.5B-Instruct", label: "Qwen Coder 0.5B", size: "≈ 500 MB" },
+  { id: "onnx-community/Qwen2.5-Coder-1.5B-Instruct", label: "Qwen Coder 1.5B", size: "≈ 1 GB" },
 ];
-
-const BUSY_NOTES = ["Schreibt Code …", "Design wird abgerundet …", "Fast fertig …"];
+const DEFAULT_MODEL = BROWSER_MODELS[0].id;
+const STORAGE_KEY = "ai-coder.v2";
+const MAX_TOKENS = 2048;
 
 /* ————— Helfer ————— */
 
@@ -69,10 +465,10 @@ function stripCode(text: string): string {
 }
 
 /** Baut den Nutzer-Task inkl. bisherigem Code für Verbesserungen. */
-function buildTaskPrompt(userPrompt: string, previousHtml?: string): string {
+function buildTaskPrompt(userPrompt: string, previousHtml: string | undefined, prevIntro: string): string {
   let prompt = userPrompt;
   if (previousHtml && previousHtml.trim()) {
-    prompt += `\n\nAktueller Code (nimm Änderungen daran vor):\n\`\`\`html\n${previousHtml.trim().slice(0, 8000)}\n\`\`\``;
+    prompt += `\n\n${prevIntro}\n\`\`\`html\n${previousHtml.trim().slice(0, 8000)}\n\`\`\``;
   }
   return prompt;
 }
@@ -91,34 +487,78 @@ async function detectDevice(useGpu: boolean): Promise<"webgpu" | "wasm"> {
   return "wasm";
 }
 
+function isLang(v: unknown): v is Lang {
+  return typeof v === "string" && LANGS.some((l) => l.code === v);
+}
+
+/** Erkennt die Sprache anhand der Browser-/Systemsprache (beste clientseitige Standort-Signale). */
+function detectLang(): Lang {
+  try {
+    if (typeof navigator === "undefined") return "en";
+    const prefs =
+      navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+    for (const raw of prefs) {
+      const b = String(raw).toLowerCase();
+      if (b.startsWith("de")) return "de";
+      if (b.startsWith("el")) return "el";
+      if (b.startsWith("ja")) return "ja";
+      if (b.startsWith("zh")) return "zh";
+      if (b.startsWith("hi")) return "hi";
+      if (b.startsWith("en")) return "en";
+    }
+  } catch {
+    // ignorieren
+  }
+  return "en";
+}
+
+/** Formatiert eine Restzeit (Sekunden) sprachabhängig. */
+function formatEta(lang: Lang, seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.max(0, Math.round(seconds % 60));
+  return TEXTS[lang].etaFmt.replace("{m}", String(m)).replace("{s}", String(s));
+}
+
+function progressLabel(lang: Lang, p: GenProgress): string {
+  const label = TEXTS[lang].genLabel.replace("{pct}", String(p.pct));
+  const eta = p.etaSec == null ? "" : ` · ${formatEta(lang, p.etaSec)}`;
+  const tok = ` · ${TEXTS[lang].tokensFmt.replace("{n}", String(p.tokens))}`;
+  return label + eta + tok;
+}
+
 /* ————— Komponente ————— */
 
 export default function Home() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [busyNote, setBusyNote] = useState(BUSY_NOTES[0]);
+  const [busyNote, setBusyNote] = useState("");
   const [modelID, setModelID] = useState(DEFAULT_MODEL);
   const [useGpu, setUseGpu] = useState(false);
+  const [lang, setLang] = useState<Lang>("en");
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [loadPct, setLoadPct] = useState<{ label: string; pct: number } | null>(null);
+  const [loadEta, setLoadEta] = useState<number | null>(null);
   const [device, setDevice] = useState<string>("");
   const [previewHtml, setPreviewHtml] = useState("");
   const [view, setView] = useState<"preview" | "code">("preview");
   const [mobileTab, setMobileTab] = useState<"chat" | "preview">("chat");
   const [copied, setCopied] = useState(false);
+  const [genProgress, setGenProgress] = useState<GenProgress | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const streamRef = useRef<{ content: string }>({ content: "" });
   const pipelinesRef = useRef<Map<string, Promise<unknown>>>(new Map());
 
-  // Beim Start: Verlauf laden, Modell im Hintergrund vorladen
+  const T = TEXTS[lang];
+
+  // Beim Start: Verlauf + Sprache laden, Modell im Hintergrund vorladen
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const saved = JSON.parse(raw) as { messages?: ChatMessage[]; model?: string; useGpu?: boolean };
+        const saved = JSON.parse(raw) as { messages?: ChatMessage[]; model?: string; useGpu?: boolean; lang?: unknown };
         if (Array.isArray(saved.messages)) {
           setMessages(saved.messages);
           const last = [...saved.messages].reverse().find((m) => m.html);
@@ -128,9 +568,17 @@ export default function Home() {
           setModelID(saved.model);
         }
         if (typeof saved.useGpu === "boolean") setUseGpu(saved.useGpu);
+        if (isLang(saved.lang)) {
+          setLang(saved.lang);
+        } else {
+          setLang(detectLang());
+        }
+      } else {
+        setLang(detectLang());
       }
     } catch {
       // beschädigter Verlauf – ignorieren
+      setLang(detectLang());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -142,6 +590,7 @@ export default function Home() {
       if (!cancelled) {
         setLoadState(p.state);
         setLoadPct(p.pct);
+        setLoadEta(p.eta ?? null);
         setDevice(p.device);
       }
     });
@@ -154,11 +603,11 @@ export default function Home() {
   // Verlauf automatisch speichern
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ messages, model: modelID, useGpu }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ messages, model: modelID, useGpu, lang }));
     } catch {
       // Speicher voll o. ä. – ignorieren
     }
-  }, [messages, modelID, useGpu]);
+  }, [messages, modelID, useGpu, lang]);
 
   // Scroll ans Ende
   useEffect(() => {
@@ -168,14 +617,14 @@ export default function Home() {
   // Rotierender Status-Text während der Generierung
   useEffect(() => {
     if (!busy) return;
-    setBusyNote(BUSY_NOTES[0]);
+    setBusyNote(T.busyNotes[0]);
     let i = 0;
     const t = setInterval(() => {
-      i = (i + 1) % BUSY_NOTES.length;
-      setBusyNote(BUSY_NOTES[i]);
+      i = (i + 1) % T.busyNotes.length;
+      setBusyNote(T.busyNotes[i]);
     }, 3000);
     return () => clearInterval(t);
-  }, [busy]);
+  }, [busy, T]);
 
   function updateAssistant(id: string, patch: Partial<ChatMessage>) {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch } : m)));
@@ -185,13 +634,13 @@ export default function Home() {
   function loadPipeline(
     modelId: string,
     gpu: boolean,
-    onStatus: (s: { state: LoadState; pct: { label: string; pct: number } | null; device: string }) => void,
+    onStatus: (s: { state: LoadState; pct: { label: string; pct: number } | null; device: string; eta?: number | null }) => void,
   ): Promise<unknown> {
     const cacheKey = `${modelId}|${gpu ? "gpu" : "cpu"}`;
     const cached = pipelinesRef.current.get(cacheKey);
     if (cached) return cached;
 
-    onStatus({ state: "loading", pct: null, device: "" });
+    onStatus({ state: "loading", pct: null, device: "", eta: null });
     const prom = (async () => {
       // Laufzeit-Import vom CDN (bewährt; mit webpackIgnore damit Turbopack/webpack
       // den Remote-Import NICHT anfasst – sonst wird er verschluckt).
@@ -211,32 +660,45 @@ export default function Home() {
       // q4 für beide Wege: kompatibel mit WebGPU UND WASM, spart Download & Speicher.
       const dtype = "q4";
 
+      const t0 = performance.now();
       const progress = (p: { status?: string; file?: string; loaded?: number; total?: number; progress?: number }) => {
         if (p.status === "progress") {
           const total = p.total ? p.total / 1048576 : 0;
           const loaded = p.loaded ? p.loaded / 1048576 : 0;
           const pct = total > 0 ? Math.round((loaded / total) * 100) : Math.round((p.progress ?? 0) * 100);
-          onStatus({ state: "loading", pct: { label: String(p.file ?? "Modell"), pct }, device: dev });
+          // Restzeit aus Download-Geschwindigkeit schätzen
+          let eta: number | null = null;
+          if (p.total && p.loaded && p.loaded > 0) {
+            const elapsed = (performance.now() - t0) / 1000;
+            const rate = p.loaded / Math.max(0.1, elapsed);
+            if (elapsed > 2 && rate > 0) eta = Math.round((p.total - p.loaded) / rate);
+          }
+          onStatus({
+            state: "loading",
+            pct: { label: String(p.file ?? TEXTS[lang].modelFile), pct },
+            device: dev,
+            eta,
+          });
         } else if (p.status === "done" || p.status === "ready") {
-          onStatus({ state: "ready", pct: null, device: dev });
+          onStatus({ state: "ready", pct: null, device: dev, eta: null });
         }
       };
 
       try {
         const gen = await pipeline("text-generation", modelId, { device: dev, dtype, progress_callback: progress });
-        onStatus({ state: "ready", pct: null, device: dev });
+        onStatus({ state: "ready", pct: null, device: dev, eta: null });
         return { gen, tokenizer: gen.tokenizer, TextStreamer, device: dev };
       } catch {
         if (dev !== "wasm") {
           const gen = await pipeline("text-generation", modelId, { device: "wasm", dtype: "q4", progress_callback: progress });
-          onStatus({ state: "ready", pct: null, device: "wasm" });
+          onStatus({ state: "ready", pct: null, device: "wasm", eta: null });
           return { gen, tokenizer: gen.tokenizer, TextStreamer, device: "wasm" };
         }
-        throw new Error("Das Modell konnte nicht geladen werden.");
+        throw new Error(TEXTS[lang].modelLoadError);
       }
     })();
 
-    prom.catch(() => onStatus({ state: "error", pct: null, device: "" }));
+    prom.catch(() => onStatus({ state: "error", pct: null, device: "", eta: null }));
     pipelinesRef.current.set(cacheKey, prom);
     return prom;
   }
@@ -254,7 +716,11 @@ export default function Home() {
     const assistantMsg: ChatMessage = { id: newId(), role: "assistant", content: "", streaming: true };
     setMessages((prev) => [...prev, userMsg, assistantMsg]);
     setBusy(true);
+    setGenProgress({ pct: 0, etaSec: null, tokens: 0 });
     streamRef.current = { content: "" };
+
+    const genStart = performance.now();
+    let tokenCount = 0;
 
     try {
       const r = (await loadPipeline(modelID, useGpu, () => {})) as {
@@ -263,9 +729,9 @@ export default function Home() {
         TextStreamer: new (tokenizer: unknown, opts: Record<string, unknown>) => unknown;
       };
 
-      const task = buildTaskPrompt(prompt, lastHtml);
+      const task = buildTaskPrompt(prompt, lastHtml, T.prevCodeIntro);
       const chatMessages = [
-        { role: "system", content: SYSTEM_INSTRUCTIONS },
+        { role: "system", content: T.system },
         { role: "user", content: task },
       ];
 
@@ -274,13 +740,28 @@ export default function Home() {
         skip_special_tokens: true,
         callback_function: (text: string) => {
           streamRef.current.content += text;
+          tokenCount += 1;
+
+          // Fortschritt + geschätzte Restzeit (aus Tokens/Sekunde)
+          const elapsed = (performance.now() - genStart) / 1000;
+          let etaSec: number | null = null;
+          if (tokenCount >= 5 && elapsed > 1) {
+            const tps = tokenCount / elapsed;
+            etaSec = Math.max(0, Math.round((MAX_TOKENS - tokenCount) / tps));
+          }
+          setGenProgress({
+            pct: Math.min(99, Math.round((tokenCount / MAX_TOKENS) * 100)),
+            etaSec,
+            tokens: tokenCount,
+          });
+
           const { html, asCode } = extractHtml(streamRef.current.content);
           if (asCode) setPreviewHtml(html);
           updateAssistant(assistantMsg.id, { streaming: true });
         },
       });
 
-      await r.gen(chatMessages, { max_new_tokens: 2048, do_sample: false, streamer });
+      await r.gen(chatMessages, { max_new_tokens: MAX_TOKENS, do_sample: false, streamer });
 
       const { html, asCode } = extractHtml(streamRef.current.content);
       const visible = stripCode(streamRef.current.content);
@@ -288,29 +769,31 @@ export default function Home() {
       updateAssistant(assistantMsg.id, {
         streaming: false,
         content: asCode
-          ? visible.slice(0, 400) || "✔ Fertig – deine App ist in der Vorschau."
-          : streamRef.current.content.trim().slice(0, 400) || "✔ Fertig.",
+          ? visible.slice(0, 400) || T.donePreview
+          : streamRef.current.content.trim().slice(0, 400) || T.done,
         html,
       });
       setMobileTab("preview");
     } catch (err) {
       updateAssistant(assistantMsg.id, {
         streaming: false,
-        content: `Fehler: ${err instanceof Error ? err.message : String(err)}`,
+        content: `${T.errorPrefix}${err instanceof Error ? err.message : String(err)}`,
         error: true,
       });
     } finally {
       setBusy(false);
+      setGenProgress(null);
     }
   }
 
   function newChat() {
-    if (messages.length > 0 && !window.confirm("Aktuellen Chat wirklich löschen?")) return;
+    if (messages.length > 0 && !window.confirm(T.confirmNewChat)) return;
     setMessages([]);
     setPreviewHtml("");
     setInput("");
     setView("preview");
     setMobileTab("chat");
+    setGenProgress(null);
     textareaRef.current?.focus();
   }
 
@@ -344,17 +827,22 @@ export default function Home() {
 
   function statusLabel(): { text: string; cls: string } {
     if (loadState === "loading") {
-      return {
-        text: loadPct ? `Modell wird geladen … ${loadPct.pct} %` : "Modell wird geladen …",
-        cls: "",
-      };
+      if (loadPct) {
+        const tpl = loadEta != null ? T.statusLoadingEta : T.statusLoading;
+        let text = tpl.replace("{pct}", String(loadPct.pct));
+        if (loadEta != null) text = text.replace("{eta}", formatEta(lang, loadEta));
+        return { text, cls: "" };
+      }
+      return { text: T.statusLoadingNoPct, cls: "" };
     }
-    if (loadState === "error") return { text: "Modell konnte nicht geladen werden", cls: "bad" };
+    if (loadState === "error") return { text: T.statusError, cls: "bad" };
     if (loadState === "ready") {
-      return { text: `Modell bereit · läuft im ${device === "webgpu" ? "Browser (GPU)" : "Browser"}`, cls: "ok" };
+      return { text: device === "webgpu" ? T.statusReadyGpu : T.statusReady, cls: "ok" };
     }
-    return { text: "bereit zu laden", cls: "" };
+    return { text: T.statusIdle, cls: "" };
   }
+
+  const size = BROWSER_MODELS.find((m) => m.id === modelID)?.size ?? "≈ 1 GB";
 
   return (
     <div className="app">
@@ -363,7 +851,7 @@ export default function Home() {
           <span className="logo">⚡</span>
           <div>
             <h1>AI-Coder</h1>
-            <span className="subtitle">Homepages, Spiele &amp; Web-Apps per Prompt</span>
+            <span className="subtitle">{T.subtitle}</span>
           </div>
         </div>
 
@@ -373,16 +861,31 @@ export default function Home() {
             {statusLabel().text}
           </span>
 
-          <label className="gpu-toggle" title="GPU nutzen, falls vorhanden (schneller). Ohne GPU läuft alles im CPU-Modus.">
+          <label className="gpu-toggle" title={T.gpuToggleTitle}>
             <input type="checkbox" checked={useGpu} onChange={(e) => setUseGpu(e.target.checked)} disabled={busy} />
             ⚡ GPU
           </label>
 
           <select
+            className="lang-select"
+            value={lang}
+            onChange={(e) => setLang(e.target.value as Lang)}
+            title={T.langSelectTitle}
+            disabled={busy}
+            aria-label={T.langSelectTitle}
+          >
+            {LANGS.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.native}
+              </option>
+            ))}
+          </select>
+
+          <select
             value={modelID}
             onChange={(e) => setModelID(e.target.value)}
             disabled={busy}
-            title="Kostenloses Browser-Modell wählen"
+            title={T.modelSelectTitle}
           >
             {BROWSER_MODELS.map((m) => (
               <option key={m.id} value={m.id}>
@@ -392,7 +895,7 @@ export default function Home() {
           </select>
 
           <button className="new-btn" onClick={newChat} disabled={busy}>
-            ✦ Neu
+            {T.newChat}
           </button>
         </div>
       </header>
@@ -400,10 +903,10 @@ export default function Home() {
       {/* Mobile Umschalter */}
       <div className="mobile-tabs">
         <button className={mobileTab === "chat" ? "active" : ""} onClick={() => setMobileTab("chat")}>
-          Chat
+          {T.tabChat}
         </button>
         <button className={mobileTab === "preview" ? "active" : ""} onClick={() => setMobileTab("preview")}>
-          Ergebnis
+          {T.tabResult}
         </button>
       </div>
 
@@ -414,13 +917,10 @@ export default function Home() {
             {messages.length === 0 && (
               <div className="welcome">
                 <div className="welcome-emoji">🛠️</div>
-                <h2>Was möchtest du bauen?</h2>
-                <p>
-                  Beschreib einfach, was du brauchst – Homepage, Spiel oder kleine Web-App.
-                  Die KI läuft dabei komplett auf diesem Gerät und zeigt dir den Code rechts live an.
-                </p>
+                <h2>{T.welcomeTitle}</h2>
+                <p>{T.welcomeText}</p>
                 <div className="examples">
-                  {EXAMPLES.map((ex) => (
+                  {T.examples.map((ex) => (
                     <button
                       key={ex.label}
                       onClick={() => {
@@ -433,13 +933,9 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="hint">
-                  100 % kostenlos · läuft direkt im Browser · kein Server, kein Account, kein API-Key
+                  {T.hintFree}
                   <br />
-                  <small>
-                    Beim ersten Start wird das Modell einmalig heruntergeladen
-                    ({BROWSER_MODELS.find((m) => m.id === modelID)?.size ?? "≈ 1 GB"}) und danach im Browser
-                    zwischengespeichert.
-                  </small>
+                  <small>{T.hintFirstLoad.replace("{size}", size)}</small>
                 </p>
               </div>
             )}
@@ -462,6 +958,15 @@ export default function Home() {
             <div ref={bottomRef} />
           </div>
 
+          {genProgress && (
+            <div className="gen-progress" role="status" aria-live="polite">
+              <div className="gen-progress-text">{progressLabel(lang, genProgress)}</div>
+              <div className="gen-progress-bar">
+                <span style={{ width: `${genProgress.pct}%` }} />
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSend}>
             <textarea
               ref={textareaRef}
@@ -474,11 +979,11 @@ export default function Home() {
                   handleSend();
                 }
               }}
-              placeholder='z. B. "Erstelle ein Snake-Spiel mit Punktestand"'
+              placeholder={T.placeholder}
               disabled={busy}
             />
             <button type="submit" disabled={busy || input.trim() === ""}>
-              {busy ? "…" : "Erstellen ▶"}
+              {busy ? "…" : T.submit}
             </button>
           </form>
         </section>
@@ -488,18 +993,18 @@ export default function Home() {
           <div className="preview-toolbar">
             <div className="segmented">
               <button className={view === "preview" ? "active" : ""} onClick={() => setView("preview")}>
-                Vorschau
+                {T.viewPreview}
               </button>
               <button className={view === "code" ? "active" : ""} onClick={() => setView("code")}>
-                Code
+                {T.viewCode}
               </button>
             </div>
             <div className="toolbar-actions">
-              <button onClick={openNewTab} disabled={!previewHtml} title="In neuem Tab öffnen">↗</button>
-              <button onClick={copyHtml} disabled={!previewHtml} title="Code kopieren">
+              <button onClick={openNewTab} disabled={!previewHtml} title={T.openTabTitle}>↗</button>
+              <button onClick={copyHtml} disabled={!previewHtml} title={T.copyTitle}>
                 {copied ? "✓" : "⧉"}
               </button>
-              <button onClick={downloadHtml} disabled={!previewHtml} title="index.html herunterladen">⬇</button>
+              <button onClick={downloadHtml} disabled={!previewHtml} title={T.downloadTitle}>⬇</button>
             </div>
           </div>
 
@@ -507,13 +1012,13 @@ export default function Home() {
             {!previewHtml ? (
               <div className="preview-empty">
                 <span className="preview-empty-icon">🖼️</span>
-                <p>Dein Ergebnis erscheint hier – live während die KI den Code schreibt.</p>
-                <p className="hint">Läuft komplett auf deinem Gerät – kein Server, kein API-Key.</p>
+                <p>{T.previewEmpty}</p>
+                <p className="hint">{T.previewHint}</p>
               </div>
             ) : view === "preview" ? (
               <iframe
                 key={previewHtml.length}
-                title="Vorschau"
+                title={T.viewPreview}
                 srcDoc={previewHtml}
                 sandbox="allow-scripts allow-modals allow-forms"
                 className="preview-frame"

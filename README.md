@@ -11,6 +11,12 @@ Eine komplett kostenlose KI-Coding-Web-App, die **ganz ohne Server** auskommt:
 - 🔁 Iteratives Verbessern: Folge-Prompts berücksichtigen den zuletzt erzeugten Code
 - 💾 Chat-Verlauf wird im Browser gespeichert (localStorage)
 - 📱 Responsiv: Mobil mit Tab-Umschalter, Desktop zweispaltig
+- 🌍 **7 Sprachen** (Deutsch, Englisch, Griechisch, Japanisch, Chinesisch, Hindi):
+  Die Sprache wird automatisch anhand der Browser-/Systemsprache gewählt
+  und lässt sich jederzeit umstellen; die KI antwortet in der gewählten Sprache
+- ⏱️ **Fortschrittsanzeige**: Während der Generierung siehst du live Prozent,
+  Anzahl Tokens und eine geschätzte Restzeit – auch beim Modell-Download wird
+  eine Restzeit angezeigt
 
 ```
 Browser (dein Gerät)  →  Qwen Coder 0.5B/1.5B (läuft lokal, WASM/WebGPU)
