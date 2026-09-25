@@ -183,6 +183,12 @@ select {
   animation: progress-pulse 1.6s ease-in-out infinite;
 }
 
+.gen-progress-note {
+  margin: 6px 2px 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
 @keyframes progress-pulse {
   0%,
   100% {

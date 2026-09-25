@@ -55,6 +55,7 @@ type Texts = {
   errorPrefix: string;
   modelLoadError: string;
   modelFile: string;
+  pendingLoad: string; // Hinweis nach Klick auf Erstellen, solange das Modell lädt
   prevCodeIntro: string;
   genLabel: string; // Platzhalter {pct}
   etaFmt: string; // Platzhalter {m} (Minuten) und {s} (Sekunden)
@@ -89,6 +90,7 @@ const TEXTS: Record<Lang, Texts> = {
     statusReady: "Modell bereit · läuft im Browser",
     statusReadyGpu: "Modell bereit · läuft im Browser (GPU)",
     statusIdle: "bereit zu laden",
+    pendingLoad: "Das Modell wird geladen – die Generierung startet automatisch, sobald es bereit ist.",
     gpuToggleTitle: "GPU nutzen, falls vorhanden (schneller). Ohne GPU läuft alles im CPU-Modus.",
     modelSelectTitle: "Kostenloses Browser-Modell wählen",
     langSelectTitle: "Sprache wählen",
@@ -149,6 +151,7 @@ Regeln:
     statusReady: "Model ready · running in the browser",
     statusReadyGpu: "Model ready · running in the browser (GPU)",
     statusIdle: "ready to load",
+    pendingLoad: "The model is loading – generation will start automatically once it's ready.",
     gpuToggleTitle: "Use GPU if available (faster). Without GPU everything runs in CPU mode.",
     modelSelectTitle: "Choose a free browser model",
     langSelectTitle: "Choose language",
@@ -209,6 +212,7 @@ Rules:
     statusReady: "Το μοντέλο είναι έτοιμο · τρέχει στο πρόγραμμα περιήγησης",
     statusReadyGpu: "Το μοντέλο είναι έτοιμο · τρέχει στο πρόγραμμα περιήγησης (GPU)",
     statusIdle: "έτοιμο προς φόρτωση",
+    pendingLoad: "Το μοντέλο φορτώνει – η δημιουργία θα ξεκινήσει αυτόματα μόλις είναι έτοιμο.",
     gpuToggleTitle: "Χρησιμοποίησε GPU αν υπάρχει (γρηγορότερο). Χωρίς GPU όλα τρέχουν σε λειτουργία CPU.",
     modelSelectTitle: "Επίλεξε δωρεάν μοντέλο στο πρόγραμμα περιήγησης",
     langSelectTitle: "Επίλεξε γλώσσα",
@@ -269,6 +273,7 @@ Rules:
     statusReady: "モデル準備完了 · ブラウザで実行中",
     statusReadyGpu: "モデル準備完了 · ブラウザで実行中（GPU）",
     statusIdle: "読み込み準備完了",
+    pendingLoad: "モデルを読み込み中です – 準備ができ次第、自動的に生成を開始します。",
     gpuToggleTitle: "利用可能ならGPUを使います（高速）。GPUがない場合はCPUモードで動作します。",
     modelSelectTitle: "無料のブラウザモデルを選択",
     langSelectTitle: "言語を選択",
@@ -328,6 +333,7 @@ Rules:
     statusReady: "模型就绪 · 正在浏览器中运行",
     statusReadyGpu: "模型就绪 · 正在浏览器中运行（GPU）",
     statusIdle: "准备加载",
+    pendingLoad: "模型正在加载 – 就绪后会自动开始生成。",
     gpuToggleTitle: "如果有 GPU 则使用 GPU（更快）。没有 GPU 时以 CPU 模式运行。",
     modelSelectTitle: "选择免费浏览器模型",
     langSelectTitle: "选择语言",
@@ -387,6 +393,7 @@ Rules:
     statusReady: "मॉडल तैयार · ब्राउज़र में चल रहा है",
     statusReadyGpu: "मॉडल तैयार · ब्राउज़र में चल रहा है (GPU)",
     statusIdle: "लोड करने के लिए तैयार",
+    pendingLoad: "मॉडल लोड हो रहा है – तैयार होते ही निर्माण स्वतः शुरू हो जाएगा।",
     gpuToggleTitle: "उपलब्ध होने पर GPU का उपयोग करें (तेज़)। GPU न होने पर सब कुछ CPU मोड में चलता है।",
     modelSelectTitle: "मुफ्त ब्राउज़र मॉडल चुनें",
     langSelectTitle: "भाषा चुनें",
@@ -446,6 +453,7 @@ Rules:
     statusReady: "Modèle prêt · tourne dans le navigateur",
     statusReadyGpu: "Modèle prêt · tourne dans le navigateur (GPU)",
     statusIdle: "prêt à charger",
+    pendingLoad: "Le modèle se charge – la génération démarrera automatiquement dès qu'il sera prêt.",
     gpuToggleTitle: "Utiliser le GPU si disponible (plus rapide). Sans GPU, tout fonctionne en mode CPU.",
     modelSelectTitle: "Choisir un modèle gratuit dans le navigateur",
     langSelectTitle: "Choisir la langue",
@@ -506,6 +514,7 @@ Règles :
     statusReady: "Modelo listo · funciona en el navegador",
     statusReadyGpu: "Modelo listo · funciona en el navegador (GPU)",
     statusIdle: "listo para cargar",
+    pendingLoad: "El modelo se está cargando: la generación comenzará automáticamente cuando esté listo.",
     gpuToggleTitle: "Usar GPU si está disponible (más rápido). Sin GPU, todo funciona en modo CPU.",
     modelSelectTitle: "Elegir un modelo gratuito en el navegador",
     langSelectTitle: "Elegir idioma",
@@ -566,6 +575,7 @@ Reglas:
     statusReady: "Mfano uko tayari · unafanya kazi kwenye kivinjari",
     statusReadyGpu: "Mfano uko tayari · unafanya kazi kwenye kivinjari (GPU)",
     statusIdle: "tayari kupakia",
+    pendingLoad: "Mfano unapakia – uundaji utaanza kiotomatiki ukishatayari.",
     gpuToggleTitle: "Tumia GPU ikiwa inapatikana (haraka zaidi). Bila GPU kila kitu kinafanya kazi kwa njia ya CPU.",
     modelSelectTitle: "Chagua mfano wa bure wa kivinjari",
     langSelectTitle: "Chagua lugha",
@@ -626,6 +636,7 @@ Sheria:
     statusReady: "Modello pronto · gira nel browser",
     statusReadyGpu: "Modello pronto · gira nel browser (GPU)",
     statusIdle: "pronto per il caricamento",
+    pendingLoad: "Il modello si sta caricando: la generazione partirà automaticamente quando sarà pronto.",
     gpuToggleTitle: "Usa la GPU se disponibile (più veloce). Senza GPU tutto gira in modalità CPU.",
     modelSelectTitle: "Scegli un modello gratuito nel browser",
     langSelectTitle: "Scegli la lingua",
@@ -686,6 +697,7 @@ Regole:
     statusReady: "Model hazır · tarayıcıda çalışıyor",
     statusReadyGpu: "Model hazır · tarayıcıda çalışıyor (GPU)",
     statusIdle: "yüklenmeye hazır",
+    pendingLoad: "Model yükleniyor – hazır olduğunda oluşturma otomatik başlayacak.",
     gpuToggleTitle: "Varsa GPU kullan (daha hızlı). GPU yoksa her şey CPU modunda çalışır.",
     modelSelectTitle: "Ücretsiz tarayıcı modeli seç",
     langSelectTitle: "Dil seç",
@@ -745,6 +757,7 @@ const STORAGE_KEY = "ai-coder.v2";
 const MAX_TOKENS = 2048;
 const LOAD_TIMEOUT_MS = 120_000; // Watchdog: Session-Initialisierung nach abgeschlossenem Download
 const LOAD_TOTAL_TIMEOUT_MS = 600_000; // Gesamt-Watchdog (auch bei hängendem Download)
+const IMPORT_TIMEOUT_MS = 60_000; // Watchdog: Laden der transformers.js-Laufzeit vom CDN
 const THREAD_CAP = 8; // Obergrenze für WASM-Threads (Stabilität auf Rechnern mit sehr vielen Kernen)
 
 /* ————— Helfer ————— */
@@ -978,10 +991,16 @@ export default function Home() {
     const prom = (async () => {
       // Laufzeit-Import vom CDN (bewährt; mit webpackIgnore damit Turbopack/webpack
       // den Remote-Import NICHT anfasst – sonst wird er verschluckt).
-      const { pipeline, TextStreamer, env } = await import(
-        /* webpackIgnore: true */
-        "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm",
-      );
+      // Mit Watchdog: auch ein hängender Modul-Download darf `busy` nie endlos festhalten.
+      let importTimer: ReturnType<typeof setTimeout> | undefined;
+      const mod = (await Promise.race([
+        import(/* webpackIgnore: true */ "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm"),
+        new Promise((_, rej) => {
+          importTimer = setTimeout(() => rej(new Error("transformers.js-Laufzeit konnte nicht geladen werden")), IMPORT_TIMEOUT_MS);
+        }),
+      ])) as typeof import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm");
+      if (importTimer) clearTimeout(importTimer);
+      const { pipeline, TextStreamer, env } = mod;
       // WASM-Threads: Standard = alle Kerne (schneller via SharedArrayBuffer/COOP-COEP).
       // Mit `?threads=1` lässt sich Single-Thread erzwingen (stabilste Umgebung, z. B. eingebettete Browser).
       const threadsParam = new URLSearchParams(window.location.search).get("threads");
@@ -1361,6 +1380,9 @@ export default function Home() {
                 <span style={{ width: `${progressInfo.pct}%` }} />
               </div>
             </div>
+          )}
+          {loadState === "loading" && genProgress && genProgress.tokens === 0 && (
+            <p className="gen-progress-note">{T.pendingLoad}</p>
           )}
 
           <form onSubmit={handleSend}>
