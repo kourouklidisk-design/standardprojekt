@@ -1335,6 +1335,15 @@ export default function Home() {
             ) : (
               <pre className="code-view">{previewHtml}</pre>
             )}
+
+            {genProgress && (
+              <div className="gen-progress preview-progress" role="status" aria-live="polite">
+                <div className="gen-progress-text">{progressLabel(lang, genProgress)}</div>
+                <div className="gen-progress-bar">
+                  <span style={{ width: `${genProgress.pct}%` }} />
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </main>
