@@ -53,7 +53,8 @@ npm run dev
 
 Tipp: `npm run build && npm start` ist deutlich stabiler als der Dev-Server
 (der Dev-Modus mit HMR kann die lange Modell-Initialisierung stören).
-Bei Problemen mit mehreren Threads: `http://localhost:3000/?threads=1`.
+Das Modell läuft stabil im WASM-Single-Thread-Modus (im Web-Worker, damit die
+Seite nicht einfriert); wer schneller generieren will, aktiviert ⚡ GPU oben.
 
 ## Deployment auf Vercel (kostenlos, ohne Server-Funktionen)
 

@@ -793,7 +793,6 @@ const MAX_TOKENS = 2048;
 const LOAD_TIMEOUT_MS = 120_000; // Watchdog: Session-Initialisierung nach abgeschlossenem Download
 const LOAD_TOTAL_TIMEOUT_MS = 600_000; // Gesamt-Watchdog (auch bei hängendem Download)
 const IMPORT_TIMEOUT_MS = 60_000; // Watchdog: Laden der transformers.js-Laufzeit vom CDN
-const THREAD_CAP = 8; // Obergrenze für WASM-Threads (Stabilität auf Rechnern mit sehr vielen Kernen)
 
 /* ————— Helfer ————— */
 
@@ -1046,19 +1045,15 @@ export default function Home() {
       ])) as typeof import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.0/+esm");
       if (importTimer) clearTimeout(importTimer);
       const { pipeline, TextStreamer, env } = mod;
-      // WASM-Threads: Standard = alle Kerne (schneller via SharedArrayBuffer/COOP-COEP).
-      // Mit `?threads=1` lässt sich Single-Thread erzwingen (stabilste Umgebung, z. B. eingebettete Browser).
-      const threadsParam = new URLSearchParams(window.location.search).get("threads");
-      if (threadsParam) {
-        env.backends.onnx.wasm.numThreads = Math.max(1, parseInt(threadsParam, 10) || 1);
-      } else {
-        // Obergrenze: verhindert Worker-Explosion/endlose Init-Zeit auf Rechnern mit sehr vielen Kernen
-        env.backends.onnx.wasm.numThreads = Math.min(navigator.hardwareConcurrency || 1, THREAD_CAP);
-      }
-      // WASM-Backend vollständig in einem Web-Worker ausführen (proxy=true):
+      // WASM komplett in einem Web-Worker ausführen (proxy=true):
       // verhindert, dass Modell-Initialisierung und erste Inferenz den Haupt-Thread
       // blockieren (sonst meldet der Browser „Seite reagiert nicht").
       env.backends.onnx.wasm.proxy = true;
+      // WICHTIG: proxy=true ist mit Multi-Thread-WASM NICHT kompatibel – pthreads
+      // innerhalb des Workers crashen mit „RuntimeError: table index is out of bounds"
+      // (die WASM-Funktionstabelle wird zwischen Threads nicht geteilt, emscripten #19307).
+      // Daher läuft WASM im Worker immer Single-Thread: stabil, dafür langsamer.
+      env.backends.onnx.wasm.numThreads = 1;
       const dev = await detectDevice(gpu);
       // q4 für beide Wege: kompatibel mit WebGPU UND WASM, spart Download & Speicher.
       const dtype = "q4";
@@ -1214,7 +1209,8 @@ export default function Home() {
 
       // Watchdog: Kommt sehr lange kein erstes Token (Prefill blockiert/steckt fest),
       // mit einer klaren Meldung abbrechen statt endlos bei 0 % zu hängen.
-      const FIRST_TOKEN_TIMEOUT_MS = 240_000;
+      // Single-Thread-WASM ist langsamer: legitimer Prefill kann 2–4 Min dauern.
+      const FIRST_TOKEN_TIMEOUT_MS = 360_000;
       let firstTokenTimer: ReturnType<typeof setInterval> | null = null;
       const firstTokenTimeout = new Promise<never>((_, rej) => {
         firstTokenTimer = setInterval(() => {
