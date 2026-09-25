@@ -743,6 +743,9 @@ const BROWSER_MODELS: BrowserModel[] = [
 const DEFAULT_MODEL = BROWSER_MODELS[0].id;
 const STORAGE_KEY = "ai-coder.v2";
 const MAX_TOKENS = 2048;
+const LOAD_TIMEOUT_MS = 120_000; // Watchdog: Session-Initialisierung nach abgeschlossenem Download
+const LOAD_TOTAL_TIMEOUT_MS = 600_000; // Gesamt-Watchdog (auch bei hängendem Download)
+const THREAD_CAP = 8; // Obergrenze für WASM-Threads (Stabilität auf Rechnern mit sehr vielen Kernen)
 
 /* ————— Helfer ————— */
 
@@ -854,6 +857,7 @@ export default function Home() {
   const [mobileTab, setMobileTab] = useState<"chat" | "preview">("chat");
   const [copied, setCopied] = useState(false);
   const [genProgress, setGenProgress] = useState<GenProgress | null>(null);
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -935,6 +939,27 @@ export default function Home() {
     return () => clearInterval(t);
   }, [busy, T]);
 
+  // Stille JS-Fehler/Rejections sichtbar machen (statt „es passiert nichts")
+  useEffect(() => {
+    const clean = (m: string) => m.replace(/^Error:\s*/i, "").slice(0, 200);
+    const onErr = (e: ErrorEvent) => setRuntimeError(clean(e.message || "JavaScript-Fehler"));
+    const onRej = (e: PromiseRejectionEvent) => {
+      const m = e.reason instanceof Error ? e.reason.message : String(e.reason);
+      setRuntimeError(clean(m || "Unbehandelte Promise"));
+    };
+    window.addEventListener("error", onErr);
+    window.addEventListener("unhandledrejection", onRej);
+    return () => {
+      window.removeEventListener("error", onErr);
+      window.removeEventListener("unhandledrejection", onRej);
+    };
+  }, []);
+
+  // Sobald das Modell bereit ist, verschwindet eine ggf. angezeigte Fehlermeldung
+  useEffect(() => {
+    if (loadState === "ready") setRuntimeError(null);
+  }, [loadState]);
+
   function updateAssistant(id: string, patch: Partial<ChatMessage>) {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch } : m)));
   }
@@ -963,47 +988,92 @@ export default function Home() {
       if (threadsParam) {
         env.backends.onnx.wasm.numThreads = Math.max(1, parseInt(threadsParam, 10) || 1);
       } else {
-        env.backends.onnx.wasm.numThreads = navigator.hardwareConcurrency || 1;
+        // Obergrenze: verhindert Worker-Explosion/endlose Init-Zeit auf Rechnern mit sehr vielen Kernen
+        env.backends.onnx.wasm.numThreads = Math.min(navigator.hardwareConcurrency || 1, THREAD_CAP);
       }
       const dev = await detectDevice(gpu);
       // q4 für beide Wege: kompatibel mit WebGPU UND WASM, spart Download & Speicher.
       const dtype = "q4";
 
-      const t0 = performance.now();
-      const progress = (p: { status?: string; file?: string; loaded?: number; total?: number; progress?: number }) => {
-        if (p.status === "progress") {
-          const total = p.total ? p.total / 1048576 : 0;
-          const loaded = p.loaded ? p.loaded / 1048576 : 0;
-          const pct = total > 0 ? Math.round((loaded / total) * 100) : Math.round((p.progress ?? 0) * 100);
-          // Restzeit aus Download-Geschwindigkeit schätzen
-          let eta: number | null = null;
-          if (p.total && p.loaded && p.loaded > 0) {
-            const elapsed = (performance.now() - t0) / 1000;
-            const rate = p.loaded / Math.max(0.1, elapsed);
-            if (elapsed > 2 && rate > 0) eta = Math.round((p.total - p.loaded) / rate);
+      // Versuch auf einem Gerät (webgpu|wasm) mit eigenem Watchdog.
+      // Watchdog: Gesamtlimit ab Start (auch bei hängendem Download) UND
+      // Init-Limit, sobald der Download fertig ist – verhindert ewiges Hängen.
+      const tryLoad = async (device: "webgpu" | "wasm"): Promise<{ gen: unknown; tokenizer: unknown }> => {
+        let aborted = false;
+        let filesDone = false;
+        const progress = (p: { status?: string; file?: string; loaded?: number; total?: number; progress?: number }) => {
+          if (aborted) return;
+          if (p.status === "progress") {
+            const total = p.total ? p.total / 1048576 : 0;
+            const loaded = p.loaded ? p.loaded / 1048576 : 0;
+            const pct = total > 0 ? Math.round((loaded / total) * 100) : Math.round((p.progress ?? 0) * 100);
+            // Restzeit aus Download-Geschwindigkeit schätzen
+            let eta: number | null = null;
+            if (p.total && p.loaded && p.loaded > 0) {
+              const elapsed = (performance.now() - t0) / 1000;
+              const rate = p.loaded / Math.max(0.1, elapsed);
+              if (elapsed > 2 && rate > 0) eta = Math.round((p.total - p.loaded) / rate);
+            }
+            onStatus({
+              state: "loading",
+              pct: { label: String(p.file ?? TEXTS[lang].modelFile), pct },
+              device,
+              eta,
+            });
+          } else if (p.status === "done" || p.status === "ready") {
+            filesDone = true;
+            // Download fertig, Initialisierung läuft noch – ehrlich „100 %" statt „bereit" zeigen.
+            onStatus({
+              state: "loading",
+              pct: { label: String(p.file ?? TEXTS[lang].modelFile), pct: 100 },
+              device,
+              eta: null,
+            });
           }
-          onStatus({
-            state: "loading",
-            pct: { label: String(p.file ?? TEXTS[lang].modelFile), pct },
-            device: dev,
-            eta,
-          });
-        } else if (p.status === "done" || p.status === "ready") {
-          onStatus({ state: "ready", pct: null, device: dev, eta: null });
-        }
+        };
+
+        const t0 = performance.now();
+        return new Promise<{ gen: unknown; tokenizer: unknown }>((resolve, reject) => {
+          const timer = setInterval(() => {
+            if (aborted) return;
+            const elapsed = performance.now() - t0;
+            if (elapsed > LOAD_TOTAL_TIMEOUT_MS || (filesDone && elapsed > LOAD_TIMEOUT_MS)) {
+              aborted = true;
+              clearInterval(timer);
+              reject(new Error("Modell-Initialisierung dauert zu lange"));
+            }
+          }, 1000);
+          pipeline("text-generation", modelId, { device, dtype, progress_callback: progress }).then(
+            (gen) => {
+              if (aborted) return;
+              aborted = true;
+              clearInterval(timer);
+              const tokenizer = (gen as { tokenizer?: unknown }).tokenizer;
+              resolve({ gen, tokenizer: tokenizer ?? gen });
+            },
+            (e) => {
+              if (aborted) return;
+              aborted = true;
+              clearInterval(timer);
+              reject(e instanceof Error ? e : new Error(TEXTS[lang].modelLoadError));
+            },
+          );
+        });
       };
 
       try {
-        const gen = await pipeline("text-generation", modelId, { device: dev, dtype, progress_callback: progress });
+        const loaded = await tryLoad(dev);
         onStatus({ state: "ready", pct: null, device: dev, eta: null });
-        return { gen, tokenizer: gen.tokenizer, TextStreamer, device: dev };
-      } catch {
+        return { gen: loaded.gen, tokenizer: loaded.tokenizer, TextStreamer, device: dev };
+      } catch (err) {
         if (dev !== "wasm") {
-          const gen = await pipeline("text-generation", modelId, { device: "wasm", dtype: "q4", progress_callback: progress });
+          // Fallback: WASM Single-Thread (stabilste Umgebung) – rettet WebGPU- und Multi-Thread-Hänger
+          env.backends.onnx.wasm.numThreads = 1;
+          const loaded = await tryLoad("wasm");
           onStatus({ state: "ready", pct: null, device: "wasm", eta: null });
-          return { gen, tokenizer: gen.tokenizer, TextStreamer, device: "wasm" };
+          return { gen: loaded.gen, tokenizer: loaded.tokenizer, TextStreamer, device: "wasm" };
         }
-        throw new Error(TEXTS[lang].modelLoadError);
+        throw err instanceof Error ? err : new Error(TEXTS[lang].modelLoadError);
       }
     })();
 
@@ -1135,6 +1205,7 @@ export default function Home() {
   }
 
   function statusLabel(): { text: string; cls: string } {
+    if (runtimeError) return { text: `${T.errorPrefix}${runtimeError}`, cls: "bad" };
     if (loadState === "loading") {
       if (loadPct) {
         const tpl = loadEta != null ? T.statusLoadingEta : T.statusLoading;
@@ -1151,16 +1222,18 @@ export default function Home() {
     return { text: T.statusIdle, cls: "" };
   }
 
-  // Einheitliche Fortschrittsanzeige (Modell laden ODER App generieren)
+  // Einheitliche Fortschrittsanzeige (Modell laden ODER App generieren).
+  // Wichtig: Solange das Modell noch lädt und die Generierung noch keine Tokens
+  // erzeugt hat, den Download-Fortschritt zeigen – sonst wirkt es wie „hängen".
   const progressInfo = (() => {
-    if (genProgress) {
-      return { label: progressLabel(lang, genProgress), pct: genProgress.pct };
-    }
-    if (loadState === "loading" && loadPct) {
+    if (loadState === "loading" && loadPct && (!genProgress || genProgress.tokens === 0)) {
       const tpl = loadEta != null ? T.statusLoadingEta : T.statusLoading;
       let text = tpl.replace("{pct}", String(loadPct.pct));
       if (loadEta != null) text = text.replace("{eta}", formatEta(lang, loadEta));
       return { label: text, pct: loadPct.pct };
+    }
+    if (genProgress) {
+      return { label: progressLabel(lang, genProgress), pct: genProgress.pct };
     }
     return null;
   })();
