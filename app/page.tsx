@@ -930,8 +930,12 @@ const PREVIEW_SHIM = `
   // Häufigster Modell-Fehler: undeklarierte Variablen wie \`interval\`, \`timer\`, \`raf\` …
   // vorbelegen, damit Lesen UND Schreiben nicht crashen (auch unter "use strict",
   // wo die Zuweisung an eine vorhandene globale Eigenschaft erlaubt ist).
+  // Auch typische Objekt-/Game-Namen: Guards wie \`if (chart)\` / \`if (audio)\`
+  // treffen dann auf null (falsy) und werfen keinen \`…is not defined\`-Crash.
   var names = ['interval','timer','timeout','raf','intervalId','timerId','gameInterval',
-    'moveInterval','gameTimer','gameLoop','gameOver','rafId','loop','animation'];
+    'moveInterval','gameTimer','gameLoop','gameOver','rafId','loop','animation',
+    'chart','chartInstance','game','app','player','audio','sound','video','engine','stage',
+    'ctx','canvas','renderer','scene','camera','world','state','score','highScore','best']; 
   for (var i = 0; i < names.length; i++) {
     try { window[names[i]] = null; } catch(e){}
   }
