@@ -59,6 +59,7 @@ type Texts = {
   prefill: string; // Platzhalter {s}: Sekunden seit Start des ersten Rechenschritts
   slowStart: string; // Meldung, wenn der erste Schritt zu lange dauert
   prevCodeIntro: string;
+  noCode: string; // Hinweis, wenn das Modell Text statt einer HTML-Datei geliefert hat
   genLabel: string; // Platzhalter {pct}
   etaFmt: string; // Platzhalter {m} (Minuten) und {s} (Sekunden)
   tokensFmt: string; // Platzhalter {n}
@@ -124,6 +125,8 @@ const TEXTS: Record<Lang, Texts> = {
     modelLoadError: "Das Modell konnte nicht geladen werden.",
     modelFile: "Modell",
     prevCodeIntro: "Aktueller Code (nimm Änderungen daran vor):",
+    noCode:
+      "⚠ Keine HTML-Datei erzeugt – das Modell hat Text statt Code geliefert. Bitte erneut versuchen oder das größere Modell (1.5B) wählen.",
     genLabel: "Generiere … {pct} %",
     etaFmt: "ca. {m} Min {s} Sek",
     tokensFmt: "{n} Tokens",
@@ -188,6 +191,8 @@ Regeln:
     modelLoadError: "The model could not be loaded.",
     modelFile: "model",
     prevCodeIntro: "Current code (make changes to it):",
+    noCode:
+      "⚠ No HTML file created – the model returned text instead of code. Please try again or choose the larger model (1.5B).",
     genLabel: "Generating … {pct} %",
     etaFmt: "about {m} min {s} s",
     tokensFmt: "{n} tokens",
@@ -252,6 +257,8 @@ Rules:
     modelLoadError: "Το μοντέλο δεν μπόρεσε να φορτωθεί.",
     modelFile: "μοντέλο",
     prevCodeIntro: "Τρέχων κώδικας (κάνε αλλαγές σε αυτόν):",
+    noCode:
+      "⚠ Δεν δημιουργήθηκε αρχείο HTML – το μοντέλο έδωσε κείμενο αντί για κώδικα. Δοκιμάστε ξανά ή επιλέξτε το μεγαλύτερο μοντέλο (1.5B).",
     genLabel: "Δημιουργία … {pct} %",
     etaFmt: "περίπου {m} λεπ. {s} δευτ.",
     tokensFmt: "{n} tokens",
@@ -315,6 +322,8 @@ Rules:
     modelLoadError: "モデルを読み込めませんでした。",
     modelFile: "モデル",
     prevCodeIntro: "現在のコード（これに変更を加えてください）:",
+    noCode:
+      "⚠ HTMLファイルが作成されませんでした – モデルがコードではなくテキストを出力しました。再試行するか、より大きなモデル（1.5B）を選択してください。",
     genLabel: "生成中 … {pct} %",
     etaFmt: "約{m}分{s}秒",
     tokensFmt: "{n}トークン",
@@ -378,6 +387,8 @@ Rules:
     modelLoadError: "无法加载模型。",
     modelFile: "模型",
     prevCodeIntro: "当前代码（请在此基础上修改）：",
+    noCode:
+      "⚠ 未生成 HTML 文件——模型输出了文本而非代码。请重试或选择更大的模型（1.5B）。",
     genLabel: "生成中 … {pct} %",
     etaFmt: "约{m}分{s}秒",
     tokensFmt: "{n} 个 Token",
@@ -441,6 +452,8 @@ Rules:
     modelLoadError: "मॉडल लोड नहीं हो सका।",
     modelFile: "मॉडल",
     prevCodeIntro: "वर्तमान कोड (इसमें बदलाव करें):",
+    noCode:
+      "⚠ कोई HTML फ़ाइल नहीं बनी – मॉडल ने कोड की जगह टेक्स्ट दिया। कृपया फिर से प्रयास करें या बड़ा मॉडल (1.5B) चुनें।",
     genLabel: "बना रहे हैं … {pct} %",
     etaFmt: "लगभग {m} मिनट {s} सेकंड",
     tokensFmt: "{n} टोकन",
@@ -505,6 +518,8 @@ Rules:
     modelLoadError: "Le modèle n'a pas pu être chargé.",
     modelFile: "modèle",
     prevCodeIntro: "Code actuel (apporte des modifications) :",
+    noCode:
+      "⚠ Aucun fichier HTML créé – le modèle a renvoyé du texte au lieu de code. Réessayez ou choisissez le modèle plus grand (1.5B).",
     genLabel: "Génération … {pct} %",
     etaFmt: "environ {m} min {s} s",
     tokensFmt: "{n} jetons",
@@ -569,6 +584,8 @@ Règles :
     modelLoadError: "El modelo no pudo cargarse.",
     modelFile: "modelo",
     prevCodeIntro: "Código actual (haz cambios en él):",
+    noCode:
+      "⚠ No se creó un archivo HTML: el modelo devolvió texto en lugar de código. Inténtalo de nuevo o elige el modelo más grande (1.5B).",
     genLabel: "Generando … {pct} %",
     etaFmt: "unos {m} min {s} s",
     tokensFmt: "{n} tokens",
@@ -633,6 +650,8 @@ Reglas:
     modelLoadError: "Mfano haukuweza kupakiwa.",
     modelFile: "mfano",
     prevCodeIntro: "Msimbo wa sasa (fanya mabadiliko juu yake):",
+    noCode:
+      "⚠ Hakuna faili la HTML lililoundwa – mfano ulitoa maandishi badala ya msimbo. Jaribu tena au chagua mfano mkubwa (1.5B).",
     genLabel: "Inaunda … {pct} %",
     etaFmt: "takriban {m} dk {s} sek",
     tokensFmt: "ishara {n}",
@@ -697,6 +716,8 @@ Sheria:
     modelLoadError: "Impossibile caricare il modello.",
     modelFile: "modello",
     prevCodeIntro: "Codice attuale (apportaci delle modifiche):",
+    noCode:
+      "⚠ Nessun file HTML creato – il modello ha restituito testo invece di codice. Riprova o scegli il modello più grande (1.5B).",
     genLabel: "Generazione … {pct} %",
     etaFmt: "circa {m} min {s} s",
     tokensFmt: "{n} token",
@@ -760,6 +781,8 @@ Regole:
     modelLoadError: "Model yüklenemedi.",
     modelFile: "model",
     prevCodeIntro: "Mevcut kod (bunun üzerinde değişiklik yap):",
+    noCode:
+      "⚠ HTML dosyası oluşturulmadı – model kod yerine metin üretti. Lütfen tekrar deneyin veya daha büyük modeli (1.5B) seçin.",
     genLabel: "Oluşturuluyor … {pct} %",
     etaFmt: "yaklaşık {m} dk {s} sn",
     tokensFmt: "{n} token",
@@ -790,6 +813,11 @@ const BROWSER_MODELS: BrowserModel[] = [
 const DEFAULT_MODEL = BROWSER_MODELS[0].id;
 const STORAGE_KEY = "ai-coder.v2";
 const MAX_TOKENS = 2048;
+
+// Zusätzliche, sprachunabhängige Ausgabe-Regel – verstärkt die System-Prompt-Regeln,
+// weil kleine Modelle (0.5B) sonst oft Text/Markdown statt Code liefern.
+const OUTPUT_RULE =
+  'CRITICAL: Reply with exactly ONE fenced code block, starting with ```html as the very first characters and ending with the final ```. Inside it: one complete, self-contained, ready-to-run HTML file (embedded CSS and JS). No explanation, no markdown lists, no text outside the code block.';
 const LOAD_TIMEOUT_MS = 120_000; // Watchdog: Session-Initialisierung nach abgeschlossenem Download
 const LOAD_TOTAL_TIMEOUT_MS = 600_000; // Gesamt-Watchdog (auch bei hängendem Download)
 const IMPORT_TIMEOUT_MS = 60_000; // Watchdog: Laden der transformers.js-Laufzeit vom CDN
@@ -802,15 +830,24 @@ function newId(): string {
 
 /** Extrahiert den HTML-Code aus einer Modell-Antwort. */
 function extractHtml(text: string): { html: string; asCode: boolean } {
-  const htmlBlock = text.match(/```html\s*\n([\s\S]*?)```/i);
+  // 1) Bevorzugt: ```html-Markdown-Codeblock (auch CRLF, mit/ohne Leerzeichen)
+  const htmlBlock = text.match(/```html\s*\r?\n?([\s\S]*?)```/i);
   if (htmlBlock && htmlBlock[1].trim()) return { html: htmlBlock[1].trim(), asCode: true };
 
-  const anyBlock = text.match(/```\s*\n?([\s\S]*?)```/);
+  // 2) Beliebiger ```-Block, dessen Inhalt nach HTML aussieht
+  const anyBlock = text.match(/```[a-zA-Z]*\s*\r?\n?([\s\S]*?)```/);
   if (anyBlock && anyBlock[1] && /<\/?[a-zA-Z][\s\S]*>/.test(anyBlock[1])) {
     return { html: anyBlock[1].trim(), asCode: true };
   }
 
-  return { html: text.trim(), asCode: false };
+  // 3) Modell hat die Fences vergessen, aber die Antwort IST HTML
+  const trimmed = text.trim();
+  if (/<!DOCTYPE html>/i.test(trimmed) || /^\s*<html[\s>]/i.test(trimmed)) {
+    return { html: trimmed, asCode: true };
+  }
+
+  // 4) Kein Code – Text/Markdown: als solches kennzeichnen (kein HTML)
+  return { html: "", asCode: false };
 }
 
 /** Entfernt Codeblöcke – übrig bleibt die „sichtbare" Antwort. */
@@ -1173,7 +1210,7 @@ export default function Home() {
 
       const task = buildTaskPrompt(prompt, lastHtml, T.prevCodeIntro);
       const chatMessages = [
-        { role: "system", content: T.system },
+        { role: "system", content: `${T.system}\n\n${OUTPUT_RULE}` },
         { role: "user", content: task },
       ];
 
@@ -1232,13 +1269,14 @@ export default function Home() {
 
       const { html, asCode } = extractHtml(streamRef.current.content);
       const visible = stripCode(streamRef.current.content);
-      setPreviewHtml(html);
+      // Kein Code erzeugt? Dann nicht roh in die Vorschau werfen, sondern klar melden.
+      setPreviewHtml(asCode ? html : "");
       updateAssistant(assistantMsg.id, {
         streaming: false,
         content: asCode
           ? visible.slice(0, 400) || T.donePreview
-          : streamRef.current.content.trim().slice(0, 400) || T.done,
-        html,
+          : `${T.noCode}${visible.trim() ? `\n\n${visible.trim().slice(0, 400)}` : ""}`,
+        html: asCode ? html : "",
       });
       setMobileTab("preview");
     } catch (err) {
