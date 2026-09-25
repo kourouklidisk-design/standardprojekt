@@ -118,6 +118,21 @@ select {
   font-size: 12px;
 }
 
+.gpu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.gpu-toggle input {
+  accent-color: var(--accent);
+  margin: 0;
+}
+
 .new-btn {
   background: transparent;
   color: var(--accent);

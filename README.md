@@ -1,107 +1,82 @@
-# AppForge – AI-App-Builder
+# AI-Coder – Homepages, Spiele & Web-Apps per Prompt
 
-Eine komplett kostenlose AI-Coding-Web-App: Über einen Prompt erstellst du
-**Homepages, Spiele und kleine Web-Apps** – das Ergebnis wird direkt im Browser
-angezeigt. Rechts siehst du die Live-Vorschau, links läuft der Chat.
+Eine komplett kostenlose KI-Coding-Web-App, die **ganz ohne Server** auskommt:
 
-Gebaut mit Next.js (Frontend) und einem **OpenCode-Server** als kostenlosem
-KI-Backend (Standardmodell `space-bunny-free`, inkl. Tool-Unterstützung, ohne
-API-Key).
+- 💬 Prompt eingeben: „Erstelle eine Landingpage …", „Baue ein Snake-Spiel …"
+- 🧠 Das KI-Modell (**Qwen 2.5 Coder**) läuft **direkt im Browser** deines Geräts
+  (WASM im CPU-Modus, optional WebGPU) – **kein Server, kein Account, kein API-Key**
+- 🖼️ Das Ergebnis erscheint als **Live-Vorschau** (sandboxed iframe) mit
+  Streaming: Der Code wird sichtbar, während er entsteht
+- 🧩 Code-Ansicht, Kopieren, Download als `index.html`, in neuem Tab öffnen
+- 🔁 Iteratives Verbessern: Folge-Prompts berücksichtigen den zuletzt erzeugten Code
+- 💾 Chat-Verlauf wird im Browser gespeichert (localStorage)
+- 📱 Responsiv: Mobil mit Tab-Umschalter, Desktop zweispaltig
 
 ```
-Browser  →  Vercel (Next.js)  →  OpenCode-Server  →  Free-Modell (opencode.ai)
-           Chat + Vorschau          (opencode serve)   Generiert HTML/CSS/JS
+Browser (dein Gerät)  →  Qwen Coder 0.5B/1.5B (läuft lokal, WASM/WebGPU)
+                        Generiert HTML/CSS/JS → Vorschau im iframe
 ```
 
-## Features
+## Warum so?
 
-- 💬 **Chat** mit Prompt: „Erstelle eine Landingpage …", „Baue ein Snake-Spiel …"
-- 🖼️ **Live-Vorschau** des erzeugten Ergebnisses (sandboxed iframe)
-- 🧩 **Code-Ansicht**, Kopieren & Download als `index.html`, in neuem Tab öffnen
-- 🧠 **Kostenlose Modell-Auswahl** (alle `opencode`-Modelle ohne Kosten, live vom Server geladen)
-- 🔁 **Iterativ verbessern** – Folge-Prompts berücksichtigen den zuletzt erzeugten Code
-- 💾 Persistenter Chat-Verlauf im Browser (localStorage)
-- 📱 Responsive: Mobil (Tab-Umschalter) und Desktop (zweispaltig)
+Die meisten „AI-Apps" brauchen einen Server (Cloud-API). Diese App nicht:
+transformers.js wird zur Laufzeit von einem CDN geladen und das Modell
+**einmalig beim ersten Besuch heruntergeladen** (≈ 380 MB bei 0.5B, ≈ 1 GB bei
+1.5B). Ab dann läuft jede Generation **kostenlos und unbegrenzt** – ganz ohne
+Server, API-Key oder Account.
+
+> ⚠️ **Erster Besuch braucht Geduld:** Je nach Verbindung dauert der
+> Modell-Download einige Minuten. Browser sollen das Modell danach
+> zwischencachen, das hängt aber vom Browser ab. Auf sehr schwachen CPUs ist
+> auch die einmalige Initialisierung (WASM) langsam – ein normaler PC/Smartphone
+> mit WebGPU ist deutlich schneller.
+>
+> Ein sehr kleines Modell stößt bei komplexen Anfragen an Grenzen – für
+> Homepages, einfache Spiele und kleine Web-Apps reicht es sehr gut.
 
 ## Lokales Setup
 
-Voraussetzungen: Node.js ≥ 20, OpenCode-CLI mit mind. einem kostenlosen Modell konfiguriert.
+Voraussetzungen: Node.js ≥ 20
 
 ```sh
-# 1. Abhängigkeiten installieren
 npm install
-
-# 2. Umgebungsvariablen anlegen
-cp .env.example .env.local
-#   → OPENCODE_PASSWORD setzen (wird beim Serverstart ausgegeben)
-
-# 3. OpenCode-Server starten (separates Terminal)
-opencode serve --port 4096
-#   → "server password …" merken
-
-# 4. Dev-Server starten
 npm run dev
 # → http://localhost:3000
 ```
 
-### Umgebungsvariablen
+Tipp: `npm run build && npm start` ist deutlich stabiler als der Dev-Server
+(der Dev-Modus mit HMR kann die lange Modell-Initialisierung stören).
+Bei Problemen mit mehreren Threads: `http://localhost:3000/?threads=1`.
 
-| Variable | Beschreibung |
-| --- | --- |
-| `OPENCODE_BASE_URL` | Adresse des OpenCode-Servers (Standard: `http://127.0.0.1:4096`) |
-| `OPENCODE_PASSWORD` | Passwort aus der Serve-Ausgabe; Auth per Basic Auth (Benutzer `opencode`) |
-| `OPENCODE_WORKSPACE` | Optional: Arbeitsverzeichnis auf dem Server-Rechner (absoluter Pfad) |
+## Deployment auf Vercel (kostenlos, ohne Server-Funktionen)
 
-## Deployment auf Vercel
+Die App ist **vollständig statisch** – kein Backend, keine Server-Funktionen,
+keine Umgebungsvariablen. Damit läuft sie im kostenlosen Vercel-Hobby-Tarif.
 
-1. Repository auf GitHub pushen und bei [vercel.com/new](https://vercel.com/new) importieren
-   (Framework wird automatisch als Next.js erkannt).
-2. Umgebungsvariablen im Vercel-Dashboard setzen:
-   - `OPENCODE_BASE_URL` → öffentlich erreichbare Adresse deines OpenCode-Servers
-     (z. B. ein Cloudflare-Tunnel oder ein gehosteter Server)
-   - `OPENCODE_PASSWORD` → Passwort des OpenCode-Servers
-3. Deploy – fertig.
+1. Repository auf GitHub pushen und bei [vercel.com/new](https://vercel.com/new) importieren.
+2. Projekt-Name vergeben (z. B. `ai-coder-ai`) → URL `https://ai-coder-ai.vercel.app`.
+3. Deploy – fertig. Es ist nichts weiter zu konfigurieren.
 
-### Backend öffentlich erreichbar machen (Tunnel)
+> Namens-Tipp: `ai-coder`, `aicoder`, `ai-coder-app` und `ai-app-builder` sind
+> bereits vergeben. Frei und geprüft: **`ai-coder-ai`** und **`aicoder-app`**.
 
-Der OpenCode-Server läuft nicht auf Vercel (zustandsbehaftet). Für Tests/Demos:
-
-```sh
-# cloudflared installieren (Windows: winget install Cloudflare.cloudflared)
-cloudflared tunnel --url http://127.0.0.1:4096
-# → URL wie https://xxx.trycloudflare.com nutzen
-```
-
-Diese URL als `OPENCODE_BASE_URL` eintragen. Achtung: Quick-Tunnel-URLs ändern
-sich bei jedem Neustart. Für Produktion einen benannten Tunnel (eigene Domain)
-oder einen gehosteten Server verwenden.
-
-> ⚠️ Der Tunnel macht den Server öffentlich erreichbar – wer das Basic-Passwort
-> kennt, hat Zugriff. Für echte Produktion stärker absichern (Reverse Proxy mit
-> Auth o. ä.).
-
-## API
-
-| Route | Beschreibung |
-| --- | --- |
-| `POST /api/generate` | Body `{ prompt, previousHtml?, modelID? }` → `{ html, model }` (One-Shot-Generierung) |
-| `GET /api/models` | Kostenlose Modelle des OpenCode-Servers (`{ models: [{ id, providerID, name }] }`) |
-| `GET /api/health` | Erreichbarkeit des OpenCode-Servers (`200`/`503`) |
+Hinweis: Die App setzt `Cross-Origin-Opener-Policy: same-origin` und
+`Cross-Origin-Embedder-Policy: require-corp` (in `next.config.ts`), damit
+WASM-Threads (SharedArrayBuffer) genutzt werden können. Nicht entfernen.
 
 ## Projektstruktur
 
 ```
 app/
-  page.tsx              AppForge UI (Chat + Vorschau + Code)
-  api/generate/route.ts Code-Generierung via OpenCode (One-Shot)
-  api/models/route.ts   Kostenlose Modell-Liste
-  api/health/route.ts   Gesundheitscheck
-lib/
-  opencode.ts           Client-Wrapper, Prompt-Bau & HTML-Extraktion
+  page.tsx            Komplette App (Chat + Vorschau + Code), KI läuft im Browser
+  layout.tsx          Metadaten (Titel, Beschreibung)
+  globals.css         Styling (dunkles, responsives Layout)
+  transformers-cdn.d.ts  Typdeklaration für den CDN-Import von transformers.js
 ```
 
 ## Sicherheit
 
-Generierte Ergebnisse laufen in einem sandboxed iframe
+Das erzeugte HTML läuft nur in einem sandboxed iframe
 (`allow-scripts allow-modals allow-forms`, ohne `allow-same-origin`), damit
-modell-generierter Code die App nicht verlassen kann.
+modell-generierter Code die App nicht verlassen kann. Deine Prompts verlassen
+**niemals dein Gerät** – das Modell arbeitet komplett lokal.
