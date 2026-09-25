@@ -228,6 +228,9 @@ main {
   flex: 1;
   display: grid;
   grid-template-columns: minmax(340px, 460px) 1fr;
+  /* minmax(0, 1fr): Die Zeile darf NICHT über den Viewport hinaus wachsen –
+     sonst wächst das Panel mit dem Inhalt und es gibt keine Scrollbalken. */
+  grid-template-rows: minmax(0, 1fr);
   gap: 1px;
   background: var(--border);
   overflow: hidden;

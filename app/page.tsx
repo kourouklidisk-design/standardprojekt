@@ -892,7 +892,11 @@ const PREVIEW_SHIM = `
   }
   shim('localStorage'); shim('sessionStorage');
   window.addEventListener('error', function(e){
-    try { parent.postMessage({ type: 'aicoder-preview-error', msg: String((e && (e.message || e.error)) || 'Script-Fehler') }, '*'); } catch(err){}
+    var msg = String((e && (e.message || e.error)) || 'Script-Fehler');
+    if (e && e.lineno != null) {
+      msg += ' (line ' + e.lineno + (e.colno != null ? ':' + e.colno : '') + ')';
+    }
+    try { parent.postMessage({ type: 'aicoder-preview-error', msg: msg }, '*'); } catch(err){}
   });
   window.addEventListener('unhandledrejection', function(e){
     try { parent.postMessage({ type: 'aicoder-preview-error', msg: 'Promise: ' + String(e && e.reason) }, '*'); } catch(err){}
@@ -904,7 +908,7 @@ const PREVIEW_SHIM = `
 // Zusätzliche, sprachunabhängige Ausgabe-Regel – verstärkt die System-Prompt-Regeln,
 // weil kleine Modelle (0.5B) sonst oft Text/Markdown statt Code liefern.
 const OUTPUT_RULE =
-  'CRITICAL: Reply with exactly ONE fenced code block, starting with ```html as the very first characters and ending with the final ```. Inside it: one complete, self-contained, ready-to-run HTML file (embedded CSS and JS). No explanation, no markdown lists, no text outside the code block. The JavaScript must run without errors: declare every variable with let or const before using it, never reference an undefined identifier, and only call clearInterval/clearTimeout on values that were actually assigned.';
+  'CRITICAL: Reply with exactly ONE fenced code block, starting with ```html as the very first characters and ending with the final ```. Inside it: one complete, self-contained, ready-to-run HTML file (embedded CSS and JS). No explanation, no markdown lists, no text outside the code block. The JavaScript must run without errors: declare every variable with let or const before using it, never reference an undefined identifier, and only call clearInterval/clearTimeout on values that were actually assigned. Before reading or writing ANY property of a DOM element (.value, .textContent, .style, .innerHTML, ...) you MUST first check that the element exists, e.g.: const el = document.getElementById("..."); if (!el) return; — document.getElementById can return null. Put your single <script> at the END of the body so all elements already exist when the script runs.';
 const LOAD_TIMEOUT_MS = 120_000; // Watchdog: Session-Initialisierung nach abgeschlossenem Download
 const LOAD_TOTAL_TIMEOUT_MS = 600_000; // Gesamt-Watchdog (auch bei hängendem Download)
 const IMPORT_TIMEOUT_MS = 60_000; // Watchdog: Laden der transformers.js-Laufzeit vom CDN
@@ -1200,6 +1204,9 @@ export default function Home() {
       const tryLoad = async (device: "webgpu" | "wasm"): Promise<{ gen: unknown; tokenizer: unknown }> => {
         let aborted = false;
         let filesDone = false;
+        // Rollendes Fenster für die Download-Rate (Bytes), damit ein langsamer
+        // Start die ETA nicht dauerhaft nach oben verzerrt.
+        const rateWindow: { t: number; loaded: number }[] = [];
         const progress = (p: { status?: string; file?: string; loaded?: number; total?: number; progress?: number }) => {
           if (aborted) return;
           if (p.status === "progress") {
@@ -1210,8 +1217,17 @@ export default function Home() {
             let eta: number | null = null;
             if (p.total && p.loaded && p.loaded > 0) {
               const elapsed = (performance.now() - t0) / 1000;
-              const rate = p.loaded / Math.max(0.1, elapsed);
-              if (elapsed > 2 && rate > 0) eta = Math.round((p.total - p.loaded) / rate);
+              rateWindow.push({ t: elapsed, loaded: p.loaded });
+              if (rateWindow.length > 40) rateWindow.shift();
+              const cutoff = elapsed - 10; // Fenster: letzte 10 Sekunden
+              let oldest = rateWindow[0];
+              for (const w of rateWindow) {
+                if (w.t >= cutoff) { oldest = w; break; }
+              }
+              if (elapsed > 2 && oldest && elapsed - oldest.t >= 3) {
+                const rate = (p.loaded - oldest.loaded) / (elapsed - oldest.t);
+                if (rate > 0) eta = Math.round((p.total - p.loaded) / rate);
+              }
             }
             onStatus({
               state: "loading",
@@ -1301,6 +1317,11 @@ export default function Home() {
     const genStart = performance.now();
     setGenStartAt(genStart);
     let tokenCount = 0;
+    // Token-Rate nur aus den echten Decode-Schritten messen (EWMA). Der Prefill
+    // (Zeit bis zum ersten Token) würde die Durchschnittsrate verwässern und die
+    // Restzeit massiv überschätzen (z. B. „ca. 20 Min" bei tatsächlich ~14 Min).
+    let genTps: number | null = null;
+    let lastTokAt: number | null = null;
 
     try {
       const r = (await loadPipeline(modelID, useGpu, () => {})) as {
@@ -1322,12 +1343,21 @@ export default function Home() {
           streamRef.current.content += text;
           tokenCount += 1;
 
-          // Fortschritt + geschätzte Restzeit (aus Tokens/Sekunde)
-          const elapsed = (performance.now() - genStart) / 1000;
+          // Fortschritt + geschätzte Restzeit (aus Tokens/Sekunde).
+          // Decode-Rate: Abstand zwischen den Token-Callbacks; der Prefill wandert
+          // nie in die Rate, weil der erste Token keinen Vorgänger hat.
+          const nowTok = performance.now();
+          if (lastTokAt != null) {
+            const dt = (nowTok - lastTokAt) / 1000;
+            if (dt > 0) {
+              const instTps = 1 / dt;
+              genTps = genTps == null ? instTps : genTps * 0.75 + instTps * 0.25;
+            }
+          }
+          lastTokAt = nowTok;
           let etaSec: number | null = null;
-          if (tokenCount >= 5 && elapsed > 1) {
-            const tps = tokenCount / elapsed;
-            etaSec = Math.max(0, Math.round((MAX_TOKENS - tokenCount) / tps));
+          if (tokenCount >= 8 && genTps != null && genTps > 0) {
+            etaSec = Math.max(0, Math.round((MAX_TOKENS - tokenCount) / genTps));
           }
           setGenProgress({
             pct: Math.min(99, Math.round((tokenCount / MAX_TOKENS) * 100)),
